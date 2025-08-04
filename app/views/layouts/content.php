@@ -6,7 +6,7 @@
                 <h2 class="">新闻管理</h2>
             </div>
             <div class="layui-card-body">
-                <form class="layui-form" method="POST" action="../../lib/save.php" enctype="multipart/form-data">
+                <form class="layui-form" method="POST" action="/lib/save" enctype="multipart/form-data">
                     <div class="layui-form-item">
                         <label class="layui-form-label">标题</label>
                         <div class="layui-input-block">
@@ -18,9 +18,24 @@
                         <div class="layui-input-inline">
                             <select name="category_id">
                                 <option value="">请选择</option>
-                                <option value="AAA">选项 A</option>
-                                <option value="BBB">选项 B</option>
-                                <option value="CCC">选项 C</option>
+                                <?php
+
+                                //包含配置文件
+                                require_once __DIR__ . '/../../../config.php';
+
+                                //获取数据库连接
+                                $pdo = getDbConnection();
+
+                                try {
+                                    //查询所有大类
+                                    $stmt = $pdo->query('SELECT id, title FROM news_categories ORDER BY id');
+                                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                        echo "<option value='" .htmlspecialchars($row['id']). "'>" .htmlspecialchars($row['title']). "</option>";
+                                    }
+                                } catch (PDOException $e) {
+                                    echo "<option value=''>加载分类失败</option>";
+                                }
+                                ?>
                             </select>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 <?php
 //数据库配置
-$dsn = 'mysql:host=localhost;dbname=editor_db;charset=utf8';
+$dsn = 'mysql:host=localhost;dbname=phpcms;charset=utf8';
 $username = 'root';
 $password = '123456';
 try {
@@ -8,7 +8,7 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     //获取最新文章
-    $stmt = $pdo->query('SELECT content FROM posts ORDER BY id DESC');
+    $stmt = $pdo->query('SELECT content FROM news ORDER BY id DESC');
     $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     echo 'Error:' .$e->getMessage();

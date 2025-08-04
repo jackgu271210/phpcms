@@ -6,8 +6,9 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // 2. 定义常量
-define('ROOT_PATH', dirname(__DIR__));
+define('ROOT_PATH', __DIR__ . '/..');
 define('APP_PATH', ROOT_PATH . '/app');
+define('LIB_PATH', ROOT_PATH . '/lib');
 
 // 3. 自动加载
 spl_autoload_register(function ($class) {
@@ -29,7 +30,10 @@ switch ($request) {
         require APP_PATH . '/views/index.php';
         break;
     case '/display':
-        require APP_PATH . '/views/Adisplay.php';
+        require APP_PATH . '/views/display.php';
+        break;
+    case '/lib/save':
+        require LIB_PATH . '/save.php';
         break;
     default:
         http_response_code(404);
