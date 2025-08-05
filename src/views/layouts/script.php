@@ -1,5 +1,5 @@
-<script src="layui/layui.js"></script>
-<script src="wangeditor/js/index.js"></script>
+<script src="../assets/layui/layui.js"></script>
+<script src="../assets/wangeditor/js/index.js"></script>
 <script>
     const { createEditor, createToolbar } = window.wangEditor
 

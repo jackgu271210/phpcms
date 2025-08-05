@@ -7,9 +7,9 @@
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="layui/css/layui.css">
-    <link rel="stylesheet" href="wangeditor/css/style.css"/>
-    <link rel="stylesheet" href="css/customer.css"/>
+    <link rel="stylesheet" href="../assets/layui/css/layui.css">
+    <link rel="stylesheet" href="../assets/wangeditor/css/style.css"/>
+    <link rel="stylesheet" href="../assets/css/customer.css"/>
 </head>
 <body>
 

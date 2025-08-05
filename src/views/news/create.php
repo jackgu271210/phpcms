@@ -1,0 +1,176 @@
+
+    <!--头部-->
+    <?php require_once '../src/views/layouts/header.php' ?>
+    <!--头部-->
+
+    <!--头部-->
+    <?php require_once '../src/views/layouts/sidebar.php' ?>
+    <!--头部-->
+
+    <!--内容主题-->
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+        <div style="padding: 30px;">
+            <div class="layui-card layui-panel">
+                <div class="layui-card-header">
+                    <h2 class="">添加新闻</h2>
+                </div>
+                <div class="layui-card-body">
+                    <form class="layui-form" method="POST" action="/news/save" enctype="multipart/form-data">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">标题</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="title" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">分类</label>
+                            <div class="layui-input-inline">
+                                <select name="category_id">
+                                    <option value="">请选择</option>
+                                    <?php
+
+                                    //包含配置文件
+                                    require_once __DIR__ . '/../../../config/database.php';
+
+                                    //获取数据库连接
+                                    $pdo = getDbConnection();
+
+                                    try {
+                                        //查询所有大类
+                                        $stmt = $pdo->query('SELECT id, title FROM news_categories ORDER BY id');
+                                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                            echo "<option value='" .htmlspecialchars($row['id']). "'>" .htmlspecialchars($row['title']). "</option>";
+                                        }
+                                    } catch (PDOException $e) {
+                                        echo "<option value=''>加载分类失败</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">网页描述</label>
+                            <div class="layui-input-block">
+                                <textarea name="description"  class="layui-textarea"></textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">关键词</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="keyword" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">新闻内容</label>
+                            <div class="layui-input-block">
+                                <div id="editor—wrapper">
+                                    <div id="toolbar-container"><!-- 工具栏 --></div>
+                                    <div id="editor-container"><!-- 编辑器 --></div>
+                                </div>
+                                <textarea name="content" id="editor-content" style="display:none;"></textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-row layui-col-space16">
+                                <div class="layui-col-xs6">
+                                    <label class="layui-form-label">内联关键词1</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="key1" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-col-xs6">
+                                    <label class="layui-form-label"> 链接1</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="url1" class="layui-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-row layui-col-space16">
+                                <div class="layui-col-xs6">
+                                    <label class="layui-form-label">内联关键词2</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="key2" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-col-xs6">
+                                    <label class="layui-form-label">链接2</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="url2" class="layui-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-row layui-col-space16">
+                                <div class="layui-col-xs6">
+                                    <label class="layui-form-label">内联关键词3</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="key3" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-col-xs6">
+                                    <label class="layui-form-label">链接3</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="url3" class="layui-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-row layui-col-space16">
+                                <div class="layui-col-xs6">
+                                    <label class="layui-form-label">内联关键词4</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="key4" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-col-xs6">
+                                    <label class="layui-form-label">链接4</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="url4" class="layui-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-row layui-col-space16">
+                                <div class="layui-col-xs6">
+                                    <label class="layui-form-label">内联关键词5</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="key5" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-col-xs6">
+                                    <label class="layui-form-label">链接5</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="url5" class="layui-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button type="submit" class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+                                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <br><br>
+        </div>
+    </div>
+    <!--内容主题-->
+
+    <!--底部-->
+    <?php require_once '../src/views/layouts/footer.php' ?>
+    <!--底部-->
+
+    <!--JS-->
+    <?php require_once '../src/views/layouts/script.php' ?>
+    <!--JS-->
+
+
