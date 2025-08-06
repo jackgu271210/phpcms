@@ -51,20 +51,42 @@ class NewsController {
     }
 
     public function listNews() {
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
-        $offset = ($page - 1) * $limit;
+            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+            $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+            $offset = ($page - 1) * $limit;
 
-        $total = $this->newsModel->getNewsCount(); // 假设有 getNewsCount() 方法返回总数
-        $data = $this->newsModel->getNewsList($offset, $limit); //假设支持分页
+            $total = $this->newsModel->getNewsCount(); // 假设有 getNewsCount() 方法返回总数
+            $data = $this->newsModel->getNewsList($offset, $limit); //假设支持分页
 
-        $response = [
-            'code' => 0,
-            'msg' => '',
-            'count' => $total,
-            'data' => $data
-        ];
+            return [
+                'code' => 0,
+                'msg' => '',
+                'count' => $total,
+                'data' => $data
+            ];
+    }
 
-        require APP_PATH . '/views/news/list.php';
+    public function delete($id) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                $affectedRows = $this->newsModel->deleteNews($id);
+                if ($affectedRows > 0) {
+                    echo json_encode([
+                        'code' => 0,
+                        'msg' => '新闻删除成功'
+                    ]);
+                } else {
+                    echo json_encode([
+                        'code' => 1,
+                        'msg' => '新闻删除失败'
+                    ]);
+                }
+            } catch (PDOException $e) {
+                echo json_encode([
+                    'code' => 1,
+                    'msg' => '新闻删除失败：' . $e->getMessage()
+                ]);
+            }
+        }
     }
 }

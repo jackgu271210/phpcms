@@ -58,7 +58,7 @@ class NewsModel
      * 查看新闻列表
      */
     public function getNewsList($offset, $limit) {
-        $stmt = $this->pdo->prepare("SELECT * FROM news LIMIT :offset, :limit");
+        $stmt = $this->pdo->prepare("SELECT * FROM news ORDER BY created_at DESC LIMIT :limit OFFSET :offset");
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
@@ -68,5 +68,16 @@ class NewsModel
     public function getNewsCount() {
         $stmt = $this->pdo->query("SELECT COUNT(*) FROM news");
         return $stmt->fetchColumn();
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     * 删除新闻
+     */
+    public function deleteNews($id) {
+        $stmt = $this->pdo->prepare("DELETE FROM news WHERE id = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
     }
 }

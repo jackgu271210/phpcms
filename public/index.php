@@ -40,7 +40,12 @@ switch ($parts[0]) {
 
         switch ($action) {
             case '':
-                $controller->listNews();
+                require APP_PATH . '/views/news/list.php';
+                break;
+            case 'list':
+                // 提供表格数据的 JSON 接口
+                header('Content-Type: application/json');
+                echo json_encode($controller->listNews());
                 break;
             case 'save':
                 $controller->save();
