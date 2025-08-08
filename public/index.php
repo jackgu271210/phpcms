@@ -28,9 +28,13 @@ $pdo = getDbConnection();
 
 // 5. 路由处理
 $request = $_SERVER['REQUEST_URI'];
-$request = trim($request, '/'); //去除首尾斜杠
-$parts = explode('/', $request);
+$path = parse_url($request, PHP_URL_PATH);
+$query = parse_url($request, PHP_URL_QUERY);
+$path = trim($path, '/');
+$parts = explode('/', $path);
 $action = isset($parts[1]) ? $parts[1] : '';
+
+
 
 switch ($parts[0]) {
     case 'news':
@@ -46,6 +50,7 @@ switch ($parts[0]) {
                 // 提供表格数据的 JSON 接口
                 header('Content-Type: application/json');
                 echo json_encode($controller->listNews());
+                exit; // 确保退出，避免多余输出
                 break;
             case 'save':
                 $controller->save();

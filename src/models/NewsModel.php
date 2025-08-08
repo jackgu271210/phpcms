@@ -58,7 +58,12 @@ class NewsModel
      * 查看新闻列表
      */
     public function getNewsList($offset, $limit) {
-        $stmt = $this->pdo->prepare("SELECT * FROM news ORDER BY created_at DESC LIMIT :limit OFFSET :offset");
+        $sql = "SELECT n.*, nc.title AS category_name
+                FROM news n
+                LEFT JOIN news_categories nc ON n.category_id = nc.id
+                ORDER BY n.created_at DESC
+                LIMIT :limit OFFSET :offset";
+        $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
@@ -68,6 +73,49 @@ class NewsModel
     public function getNewsCount() {
         $stmt = $this->pdo->query("SELECT COUNT(*) FROM news");
         return $stmt->fetchColumn();
+    }
+
+    public function getNewsById($id) {
+        $sql = "SELECT n.*, nc.title AS category_name
+               FROM news n
+               LEFT JOIN news_categories nc ON n.category_id = nc.id
+               WHERE n.id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function updateNews($id, $data) {
+        $sql = "UPDATE news SET title = :title, category_id = :category_id, description = :description, keyword = :keyword, 
+                content = :content, key1 = :key1, url1 = :url1, key2 = :key2, url2 = :url2, key3 = :key3, url3 = :url3, 
+                key4 = :key4, url4 = :url4, key5 = :key5, url5 = :url5 
+                WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':id' => $id,
+            ':title' => $data['title'],
+            ':category_id' => (int)$data['category_id'],
+            ':description' => $data['description'],
+            ':keyword' => $data['keyword'],
+            ':content' => $data['content'],
+            ':key1' => $data['key1'],
+            ':url1' => $data['url1'],
+            ':key2' => $data['key2'],
+            ':url2' => $data['url2'],
+            ':key3' => $data['key3'],
+            ':url3' => $data['url3'],
+            ':key4' => $data['key4'],
+            ':url4' => $data['url4'],
+            ':key5' => $data['key5'],
+            ':url5' => $data['url5'],
+        ]);
+        return $stmt->rowCount();
+    }
+
+    public function getCategories() {
+        $stmt = $this->pdo->query("SELECT id, title FROM news_categories");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**

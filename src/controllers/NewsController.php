@@ -66,6 +66,61 @@ class NewsController {
             ];
     }
 
+    public function edit($id) {
+       if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+           $data = [
+               'title' => $_POST['title'] ?? '',
+               'category_id' => (int)($_POST['category_id'] ?? 0),
+               'description' => $_POST['description'] ?? '',
+               'keyword' => $_POST['keyword'] ?? '',
+               'content' => $_POST['content'] ?? '',
+               'key1' => $_POST['key1'] ?? '',
+               'url1' => $_POST['url1'] ?? '',
+               'key2' => $_POST['key2'] ?? '',
+               'url2' => $_POST['url2'] ?? '',
+               'key3' => $_POST['key3'] ?? '',
+               'url3' => $_POST['url3'] ?? '',
+               'key4' => $_POST['key4'] ?? '',
+               'url4' => $_POST['url4'] ?? '',
+               'key5' => $_POST['key5'] ?? '',
+               'url5' => $_POST['url5'] ?? ''
+           ];
+
+           if (empty($data['title'] || $data['category_id'] === 0)) {
+               http_response_code(400);
+               echo json_encode([
+                   'code' => 1,
+                   'msg' => '标题和分类不能为空'
+               ]);
+               exit;
+           }
+
+           try {
+                $this->newsModel->updateNews($id, $data);
+                echo json_encode([
+                    'code' => 0,
+                    'msg' => '更新成功'
+                ]);
+           } catch (PDOException $e) {
+                http_response_code(500);
+                echo json_encode([
+                    'code' => 1,
+                    'msg' => '更新失败: ' . $e->getMessage()
+                ]);
+           }
+           exit;
+       }
+
+       $news = $this->newsModel->getNewsById($id);
+       if ($news) {
+           $categories = $this->newsModel->getCategories();
+           require APP_PATH . '/views/news/edit.php';
+       } else {
+           http_response_code(400);
+           require APP_PATH . '/views/404.php';
+       }
+    }
+
     public function delete($id) {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
