@@ -46,6 +46,9 @@ switch ($parts[0]) {
             case '':
                 require APP_PATH . '/views/news/list.php';
                 break;
+            case 'categories':
+                $controller->categories();
+                break;
             case 'list':
                 // 提供表格数据的 JSON 接口
                 header('Content-Type: application/json');
@@ -60,6 +63,9 @@ switch ($parts[0]) {
                 break;
             case 'delete':
                 $controller->delete($id);
+                break;
+            case 'batchDelete':
+                $controller->batchDelete();
                 break;
             default:
                 http_response_code(404);

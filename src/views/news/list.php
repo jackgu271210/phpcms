@@ -1,29 +1,81 @@
 
 <!--头部-->
-<?php require_once '../src/views/layouts/header.php' ?>
+<?php require_once APP_PATH . '/views/layouts/header.php' ?>
 <!--头部-->
 
-<!--头部-->
-<?php require_once '../src/views/layouts/sidebar.php' ?>
-<!--头部-->
+<!--侧边栏-->
+<?php require_once APP_PATH . '/views/layouts/sidebar.php' ?>
+<!--侧边栏-->
 
 <!--内容主题-->
 <div class="layui-body">
     <!-- 内容主体区域 -->
-    <div style="padding: 30px;">
+    <div class="layui-margin-5">
         <div class="layui-card layui-panel">
             <div class="layui-card-header">
                 <h2 class="">新闻列表</h2>
             </div>
-            <!-- Add news button (optional) -->
-            <button class="layui-btn" id="addNews">添加新闻</button>
-            <table id="newsTable" lay-filter="newsTable"></table>
-            <script type="text/html" id="toolDemo">
-                <div class="layui-clear-space">
-                    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+            <div class="layui-card-body">
+                <div class="layui-table-view layui-form layui-border-box">
+                    <div class="layui-row layui-table-tool">
+                        <div class="layui-col-md3">
+                            <button class="layui-btn" id="btnAdd">
+                                <i class="layui-icon layui-icon-add-1"></i>
+                                新增
+                            </button>
+                            <button class="layui-btn layui-btn-danger" id="btnBatchDelete">
+                                <i class="layui-icon layui-icon-delete"></i>
+                                批量删除
+                            </button>
+                        </div>
+                        <div class="layui-col-md9" style="text-align: right">
+                            <div class="layui-inline">
+                                <div class="layui-input-wrap">
+                                    <select name="category_id" lay-filter="category-filter">
+                                        <option value="所有新闻"></option>
+                                        <!--动态分类数据将通过JS提供-->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <div class="layui-input-wrap">
+                                    <div class="layui-input-prefix">
+                                        <i class="layui-icon layui-icon-date"></i>
+                                    </div>
+                                    <input type="text" name="date" id="date" lay-verify="date"
+                                           placeholder="开始日" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <div class="layui-input-wrap">
+                                    <div class="layui-input-prefix">
+                                        <i class="layui-icon layui-icon-date"></i>
+                                    </div>
+                                    <input type="text" name="date" id="date" lay-verify="date"
+                                           placeholder="结束日" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <input type="tel" name="phone" lay-verify="required|phone" placeholder="请输入搜索内容"  autocomplete="off" lay-reqtext="请填写手机号" lay-affix="clear" class="layui-input demo-phone">
+                                </div>
+                                <div class="layui-input-inline" style="padding: 0!important;">
+                                    <button type="button" class="layui-btn"lay-on="get-vercode">
+                                        <i class="layui-icon layui-icon-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </script>
+                <table id="newsTable" lay-filter="newsTable"></table>
+                <script type="text/html" id="toolDemo">
+                    <div class="layui-clear-space">
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+                    </div>
+                </script>
+            </div>
         </div>
         <br><br>
     </div>
@@ -31,73 +83,183 @@
 <!--内容主题-->
 
 <!--底部-->
-<?php require_once '../src/views/layouts/footer.php' ?>
+<?php require_once APP_PATH .  '/views/layouts/footer.php' ?>
 <!--底部-->
-
-<script src="../assets/layui/layui.js"></script>
-<script src="../assets/wangeditor/js/index.js"></script>
-<script src="../assets/js/news-common.js"></script>
 <script>
-    layui.use(['table', 'jquery'], function() {
+    layui.use(['table', 'form', 'laydate', 'layer'], function() {
         var table = layui.table;
-        var $ = layui.jquery;
-        // 渲染表格
-        table.render({
+        var form = layui.form;
+        var layer = layui.layer;
+        var laydate = layui.laydate;
+        var $ = layui.$;
+
+        // 初始化表格
+        window.tableIns = table.render({
             elem: '#newsTable',
             url: '/news/list', // 如果使用 AJAX，可填入数据接口 URL
-            method: 'GET',
             page: true, // 开启分页
             limit: 5, // 每页显示数量
             limits: [10, 20, 30], // 分页选项
-            headers: {'Cache-Control': 'no-cache'},
             cols: [[
+                {type: 'checkbox', fixed: 'left'},
                 {field: 'id', title: 'ID', width: 150, sort: true},
                 {field: 'title', title: '标题'},
                 {field: 'category_name', title: '类别'},
                 {field: 'created_at', title: '加入时间', width: 200, sort: true},
                 {fixed: 'right', title:'操作', width: 134, minWidth: 125, templet: '#toolDemo'}
-            ]],
-            totalRow: false, // 是否显示总计行
-            error: function(res, msg) {
-                console.error('Table request failed:', res, msg);
-                layer.msg('表格数据加载失败: ' + msg, {icon: 2});
-            },
-            done: function(res, curr, count) {
-                console.log('Table data loaded:', res, curr, count);
-                if (res.code !== 0) {
-                    layer.msg('数据加载失败: ' + res.msg, {icon: 2});
+            ]]
+        });
+
+        // 日期
+        laydate.render({
+           elem: '#date'
+        });
+
+        // 加载分类并初始化下拉菜单
+        function loadCategories() {
+            $.ajax({
+                url: '/news/categories',
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    if (res.code === 0) {
+                        var html = '<option value="">所有新闻</option>';
+                        $.each(res.data, function(index, item) {
+                            html += '<option value="'+item.id+'">' +item.title+ '</option>'
+                        });
+                        $('select[name="category_id"]').html(html);
+                        form.render('select');
+                    }
                 }
+            });
+        }
+
+        // 页面加载完成后初始化分类下拉框
+        loadCategories();
+
+        // 分类筛选事件
+        form.on('select(category-filter)', function(data) {
+            tableIns.reload({
+                where: {
+                    category_id: data.value
+                },
+                page: {curr: 1}
+            });
+        });
+
+        // 搜索
+        form.on('submit(formSearch)', function(data) {
+            tableIns.reload({
+                where: data.field,
+                page: {curr:1}
+            });
+            return false;
+        });
+
+        // 添加按钮
+        $('#btnAdd').click(function() {
+            showForm();
+        });
+
+        // 工具条事件
+        table.on('tool(newsTable)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                showForm(data);
+            } else if (obj.event === 'delete') {
+                deleteData(data.id);
             }
         });
 
-        initializeNewsModule();
+        // 显示表单弹窗
+        function showForm(data) {
+            data = data || {};
+            var id = data.id;
+            var title = data.id ? '编辑新闻' : '添加新闻';
+            layer.open({
+                type:2,
+                title:title,
+                area: ['80%', '80%'],
+                content: '/news/edit/' + id, // 编辑页面URL
+                success: function(layero, index) {
+                    // 弹窗加载成功后的回调
+                    var iframe = layero.find('iframe')[0];
+                    var iframeWin = iframe.contentWindow;
 
-        $('#addNews').on('click', function() {
-            fetch('/news/edit/0') // 0 for new news
-                .then(response => response.text())
-                .then(html => {
-                    layui.layer.open({
-                        type: 1,
-                        title: '添加新闻',
-                        area: ['80%', '80%'],
-                        content: html,
-                        success: function(layero, index) {
-                            setTimeout(() => {
-                                if (typeof window.initEditor === 'function') {
-                                    window.initEditor();
-                                }
-                                layui.form.render();
-                            }, 100);
+                    // 如果是编辑，可以传递数据到iframe
+                    if (id && data) {
+                        // 延迟确保iframe加载完成
+                        setTimeout(function() {
+                            iframeWin.setFormData(data);
+                        }, 300);
+                    }
+                }
+            });
+        }
+
+        // 单个删除数据
+        function deleteData(id) {
+            layer.confirm('确认删除吗', function(index) {
+                $.ajax({
+                    url: '/news/delete/' + id,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function(res) {
+                        if (res.code === 0) {
+                            layer.msg(res.msg, {icon:1});
+                            tableIns.reload();
+                        } else {
+                            layer.msg(res.msg, {icon:2});
                         }
-                    });
+                    },
+                    error: function() {
+                        layer.msg('请求失败', {icon:2});
+                        layer.close(index);
+                    }
                 })
-                .catch(error => {
-                    console.error('Error fetching add form:', error);
-                    layui.layer.msg('加载添加表单失败: ' + error, { icon: 2 });
+            })
+        }
+
+
+        // 批量删除点击按钮事件
+        $('#btnBatchDelete').click(function() {
+            var checkStatus = table.checkStatus('newsTable');
+            var selectedIds = checkStatus.data ? checkStatus.data.map(item => item.id) : [];
+
+            if (selectedIds.length === 0) {
+                layer.msg('请至少选择一条记录', {icon:2});
+                return;
+            }
+
+            layer.confirm('确定要删除选中的' +selectedIds.length + '条记录吗', function(index) {
+                var loading = layer.load();
+                // 发送批量删除请求
+                $.ajax({
+                    url: '/news/batchDelete',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ids: selectedIds}),
+                    success: function(res) {
+                        layer.close(loading);
+                        if (res.code === 0) {
+                            layer.msg(res.msg, {icon:1});
+                            tableIns.reload();
+                        } else {
+                            layer.msg(res.msg, {icon:2});
+                        }
+                    },
+                    error: function() {
+                        layer.msg('请求失败', {icon:2})
+                    }
                 });
-        });
-    });
+                layer.close(index);
+            });
+        })
     });
 </script>
+
+
+
+
 
 

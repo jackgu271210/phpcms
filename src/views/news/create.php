@@ -169,8 +169,4 @@
     <?php require_once '../src/views/layouts/footer.php' ?>
     <!--底部-->
 
-    <!--JS-->
-    <?php require_once '../src/views/layouts/script.php' ?>
-    <!--JS-->
-
 

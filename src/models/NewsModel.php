@@ -57,21 +57,39 @@ class NewsModel
      * @return mixed
      * 查看新闻列表
      */
-    public function getNewsList($offset, $limit) {
+    public function getNewsList($offset, $limit, $category_id = null) {
         $sql = "SELECT n.*, nc.title AS category_name
                 FROM news n
-                LEFT JOIN news_categories nc ON n.category_id = nc.id
-                ORDER BY n.created_at DESC
-                LIMIT :limit OFFSET :offset";
+                LEFT JOIN news_categories nc ON n.category_id = nc.id";
+
+        if ($category_id !== null) {
+            $sql .= " WHERE n.category_id = :category_id";
+        }
+
+        $sql .= " ORDER BY n.created_at DESC LIMIT :offset :limit";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+
+        if ($category_id !== null) {
+            $stmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
+        }
+
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getNewsCount() {
-        $stmt = $this->pdo->query("SELECT COUNT(*) FROM news");
+    public function getNewsCount($category_id = null) {
+        $sql = "SELECT COUNT(*) FROM news";
+        if ($category_id !== null) {
+            $sql .= " WHERE category_id = :category_id";
+        }
+        $stmt = $this->pdo->prepare($sql);
+        if ($category_id !== null) {
+            $stmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
+        }
+        $stmt->execute();
         return $stmt->fetchColumn();
     }
 
@@ -128,4 +146,15 @@ class NewsModel
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
     }
+
+  public function batchDelete(array $ids) {
+        // 创建ID占位符
+      $placeholders = implode(',', array_fill(0,count($ids), '?'));
+
+      $sql = "DELETE FROM news WHERE id IN ($placeholders)";
+      $stmt = $this->pdo->prepare($sql);
+      $stmt->execute($ids);
+
+      return $stmt->rowCount();
+  }
 }

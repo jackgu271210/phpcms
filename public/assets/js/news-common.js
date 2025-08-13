@@ -1,180 +1,121 @@
-function initializeNewsModule(options = {}) {
-    layui.use(['table', 'jquery', 'form'], function() {
-        var table = layui.table;
-        var $ = layui.jquery;
-        var form = layui.form;
-        var layer = layui.layer;
+layui.use(['table', 'form', 'layer'], function() {
+    var table = layui.table;
+    var form = layui.form;
+    var layer = layui.layer;
+    var $ = layui.$;
 
-        // Default options
-        var defaults = {
-            tableId: 'newsTable',
-            editUrl: '/news/edit/',
-            saveUrl: '/news/save',
-            deleteUrl: '/news/delete',
-            formFilter: 'demo1',
-            onEditorInit: null // Callback for custom editor initialization
-        };
-        var config = $.extend({}, defaults, options);
-
-        // Form submission
-        form.on('submit(' + config.formFilter + ')', function(data) {
-            layer.load(1); // Show loading animation
-            fetch(config.saveUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data.field)
-            })
-                .then(response => response.json())
-                .then(res => {
-                    layer.closeAll('loading');
-                    if (res.code === 0) {
-                        layer.msg('保存成功', { icon: 1 });
-                        layer.closeAll();
-                        table.reload(config.tableId);
-                    } else {
-                        layer.msg('保存失败: ' + res.msg, { icon: 2 });
-                    }
-                })
-                .catch(error => {
-                    layer.closeAll('loading');
-                    layer.msg('请求失败: ' + error, { icon: 2 });
-                });
-            return false; // Prevent default submission
-        });
-
-        // Table event handling
-        table.on('tool(' + config.tableId + ')', function(obj) {
-            var data = obj.data;
-            var id = obj.data.id;
-            if (obj.event === 'edit') {
-                fetch(config.editUrl + id)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('网络响应失败！');
-                        }
-                        return response.text();
-                    })
-                    .then(html => {
-                        layer.open({
-                            type: 1,
-                            title: '编辑新闻',
-                            area: ['80%', '80%'],
-                            content: html,
-                            success: function(layero, index) {
-                                // Check editor containers
-                                if (layero.find('#editor-container').length === 0 || layero.find('#toolbar-container').length === 0) {
-                                    console.error('Editor containers not found in popup');
-                                    layer.msg('编辑器容器未找到', { icon: 2 });
-                                    return;
-                                }
-
-                                // Ensure wangEditor is loaded
-                                if (typeof window.wangEditor === 'undefined') {
-                                    console.error('wangEditor not loaded');
-                                    layer.msg('编辑器脚本未加载', { icon: 2 });
-                                    return;
-                                }
-
-                                // Initialize editor with delay
-                                setTimeout(() => {
-                                    if (typeof window.initEditor === 'function') {
-                                        window.initEditor();
-                                        console.log('initEditor called');
-                                    } else {
-                                        console.error('initEditor function not defined');
-                                        layer.msg('编辑器初始化失败', { icon: 2 });
-                                    }
-                                    form.render();
-                                    if (config.onEditorInit) {
-                                        config.onEditorInit(layero, index);
-                                    }
-                                }, 100);
-                            }
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error fetching edit form:', error);
-                        layer.msg('加载编辑表单失败: ' + error, { icon: 2 });
-                    });
-            } else if (obj.event === 'delete') {
-                layer.confirm('确定删除吗？', function(index) {
-                    fetch(config.deleteUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id: id })
-                    })
-                        .then(response => response.json())
-                        .then(res => {
-                            if (res.code === 0) {
-                                layer.msg(res.msg, { icon: 1 });
-                                table.reload(config.tableId);
-                                layer.close(index);
-                            } else {
-                                layer.msg(res.msg, { icon: 2 });
-                            }
-                        })
-                        .catch(err => {
-                            layer.msg('请求失败: ' + err, { icon: 2 });
-                        });
-                }, function(index) {
-                    layer.close(index);
-                });
-            }
-        });
+    // 初始化表格
+    var tableIns = table.render({
+        elem: '#newsTable',
+        url: '/news/list', // 如果使用 AJAX，可填入数据接口 URL
+        page: true, // 开启分页
+        limit: 5, // 每页显示数量
+        limits: [10, 20, 30], // 分页选项
+        cols: [[
+            {field: 'id', title: 'ID', width: 150, sort: true},
+            {field: 'title', title: '标题'},
+            {field: 'category_name', title: '类别'},
+            {field: 'created_at', title: '加入时间', width: 200, sort: true},
+            {fixed: 'right', title:'操作', width: 134, minWidth: 125, templet: '#toolDemo'}
+        ]]
     });
-}
 
-function initEditor() {
-    console.log('initEditor function started');
-    if (!window.wangEditor) {
-        console.error('wangEditor is not loaded.');
-        layui.layer.msg('编辑器加载失败，请检查网络或脚本路径', { icon: 2 });
-        return;
-    }
+    // 搜索
+    form.on('submit(formSearch)', function(data) {
+        tableIns.reload({
+            where: data.field,
+            page: {curr:1}
+        });
+        return false;
+    });
 
-    const { createEditor, createToolbar } = window.wangEditor;
-    console.log('Editor containers:', document.getElementById('editor-container'), document.getElementById('toolbar-container'));
+    // 添加按钮
+    $('#btnAdd').click(function() {
+        showForm();
+    });
 
-    const editorConfig = {
-        placeholder: '请输入内容...',
-        onChange(editor) {
-            const html = editor.getHtml();
-            document.getElementById('editor-content').value = html;
-            console.log('Editor content updated:', html);
-        },
-        MENU_CONF: {
-            uploadImage: {
-                server: '/upload.php',
-                fieldName: 'file',
-                maxFileSize: 20 * 1024 * 1024,
-                allowedFileTypes: ['image/*'],
-                customInsert(res, insertFn) {
-                    if (res.errno === 1) {
-                        layui.layer.msg(res.message, { icon: 2 });
-                        return;
-                    }
-                    insertFn(res.data.url);
+    // 工具条事件
+    table.on('tool(newsTable)', function (obj) {
+        var data = obj.data;
+        if (obj.event === 'edit') {
+            showForm(data);
+        } else if (obj.event === 'delete') {
+            deleteData(data.id);
+        }
+    });
+
+    // 显示表单弹窗
+    function showForm(data) {
+        data = data || {};
+        var id = data.id;
+        var title = data.id ? '编辑新闻' : '添加新闻';
+        layer.open({
+            type:2,
+            title:title,
+            area: ['80%', '80%'],
+            content: '/news/edit/' + id, // 编辑页面URL
+            success: function(layero, index) {
+                // 弹窗加载成功后的回调
+                var iframe = layero.find('iframe')[0];
+                var iframeWin = iframe.contentWindow;
+
+                // 如果是编辑，可以传递数据到iframe
+                if (id && data) {
+                    // 延迟确保iframe加载完成
+                    setTimeout(function() {
+                        iframeWin.setFormData(data);
+                    }, 300);
                 }
             }
-        }
-    };
+        });
+    }
 
-    const editor = createEditor({
-        selector: '#editor-container',
-        html: document.getElementById('editor-content').value || '<p><br></p>',
-        config: editorConfig,
-        mode: 'default'
+    // 表单提交
+    form.on('submit(formSubmit)', function(data) {
+        // var url = data.field.id ? '/news/edit' : '/news/save';
+
+        data.field.content = editor.getHtml();
+        $.ajax({
+            url: '/news/save',
+            type: 'POST',
+            data: data.field,
+            dataType: 'json',
+            success: function(res) {
+                if (res.code === 0) {
+                    layer.msg(res.msg, {icon:1});
+                    layer.closeAll();
+                    tableIns.reload();
+                } else {
+                    layer.msg(res.msg, {icon:2});
+                }
+            },
+            error: function() {
+                layer.msg('请求失败', {icon:2});
+            }
+        });
+        return false;
     });
 
-    const toolbarConfig = {};
-
-    const toolbar = createToolbar({
-        editor,
-        selector: '#toolbar-container',
-        config: toolbarConfig,
-        mode: 'default'
-    });
-
-    window.wangEditor._editor = editor;
-    console.log('wangEditor initialized');
-}
+    // 删除数据
+    function deleteData(id) {
+        layer.confirm('确认删除吗', function(index) {
+            $.ajax({
+                url: '/news/delete/' + id,
+                method: 'POST',
+                dataType: 'json',
+                success: function(res) {
+                    if (res.code === 0) {
+                        layer.msg(res.msg, {icon:1});
+                        tableIns.reload();
+                    } else {
+                        layer.msg(res.msg, {icon:2});
+                    }
+                },
+                error: function() {
+                    layer.msg('请求失败', {icon:2});
+                    layer.close(index);
+                }
+            })
+        })
+    }
+});
