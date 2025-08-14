@@ -30,8 +30,11 @@ class NewsModel
      */
     public function saveNews($title, $category_id, $description, $keyword, $content, $key1, $url1, $key2, $url2, $key3, $url3, $key4, $url4, $key5, $url5)
     {
+        // 替换原来的NOW()
+        $randomDate = date('Y-m-d H:i:s', mt_rand(strtotime('-1 year'), time()));
+
         $sql = "INSERT INTO news (title, category_id, description, keyword, content, key1, url1, key2, url2, key3, url3, key4, url4, key5, url5, created_at)
-        VALUES (:title, :category_id, :description, :keyword, :content, :key1, :url1, :key2, :url2, :key3, :url3, :key4, :url4, :key5, :url5, NOW())";
+        VALUES (:title, :category_id, :description, :keyword, :content, :key1, :url1, :key2, :url2, :key3, :url3, :key4, :url4, :key5, :url5, :created_at)";
         $stmt = $this->pdo->prepare($sql);
 
         $stmt->bindParam(':title', $title);
@@ -49,6 +52,7 @@ class NewsModel
         $stmt->bindParam(':url4', $url4);
         $stmt->bindParam(':key5', $key5);
         $stmt->bindParam(':url5', $url5);
+        $stmt->bindParam(':created_at', $randomDate);
 
         return $stmt->execute();
     }
@@ -66,7 +70,7 @@ class NewsModel
             $sql .= " WHERE n.category_id = :category_id";
         }
 
-        $sql .= " ORDER BY n.created_at DESC LIMIT :offset :limit";
+        $sql .= " ORDER BY n.created_at DESC LIMIT :offset, :limit";
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
@@ -133,6 +137,51 @@ class NewsModel
 
     public function getCategories() {
         $stmt = $this->pdo->query("SELECT id, title FROM news_categories");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function searchNews($params) {
+        $sql = "SELECT n.* FROM news n WHERE 1=1";
+
+        $conditions = [];
+        $bindValues = [];
+
+        // 时间筛选范围
+        if (!empty($params['start_date'])) {
+            $conditions[] = "n.created_at >= :start_date";
+            $bindValues[':start_date'] = $params['start_date'];
+        }
+        if (!empty($params['end_date'])) {
+            $conditions[] = "n.created_at >= :end_date";
+            $bindValues[':end_date'] = $params['end_date'];
+        }
+
+        // 关键词搜索
+        if (!empty($params['keyword'])) {
+            $conditions[] = "(n.title LIKE :keyword OR n.content LIKE :keyword)";
+            $bindValues[':keyword'] = '%' . $params['keyword'] . '%';
+        }
+
+        if (!empty($conditions)) {
+            $sql .= " AND " . implode(" AND ", $conditions);
+        }
+
+        $sql .= " ORDER BY n.created_at DESC";
+
+        if (isset($params['offset']) && isset($params['limit'])) {
+            $sql .= " LIMIT :offset, :limit";
+            $bindValues[':offset'] = (int)$params['offset'];
+            $bindValues[':limit'] = (int)$params['limit'];
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+
+        foreach ($bindValues as $key => $value) {
+            $paramType = is_int($value) ? PDO::PARAM_INT :PDO::PARAM_STR;
+            $stmt->bindValue($key, $value, $paramType);
+        }
+
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

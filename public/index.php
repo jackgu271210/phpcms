@@ -37,6 +37,9 @@ $action = isset($parts[1]) ? $parts[1] : '';
 
 
 switch ($parts[0]) {
+    case 'faker':
+        require APP_PATH . '/lib/generate_fake_data.php';
+        break;
     case 'news':
         require APP_PATH . '/controllers/NewsController.php';
         $controller = new NewsController($pdo);

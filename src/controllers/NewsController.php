@@ -93,8 +93,17 @@ class NewsController {
             $category_id = isset($_GET['category_id']) ? (int)$_GET['category_id'] : null;
             $offset = ($page - 1) * $limit;
 
-            $total = $this->newsModel->getNewsCount($category_id); // 假设有 getNewsCount() 方法返回总数
-            $data = $this->newsModel->getNewsList($offset, $limit, $category_id); //假设支持分页
+            // 获取搜索参数
+            $params = [
+                'start_date' => isset($_GET['start_date']) ? $_GET['start_date'] : null,
+                'end_date' => isset($_GET['end_date']) ? $_GET['end_date'] : null,
+                'keyword' => isset($_GET['keyword']) ? trim($_GET['keyword']) : null,
+                'offset' => $offset,
+                'limit' => $limit
+            ];
+
+            $total = $this->newsModel->getNewsCount($category_id);
+            $data = $this->newsModel->searchNews($params);
 
             return [
                 'code' => 0,

@@ -18,7 +18,7 @@
             <div class="layui-card-body">
                 <div class="layui-table-view layui-form layui-border-box">
                     <div class="layui-row layui-table-tool">
-                        <div class="layui-col-md3">
+                        <div style="float:left">
                             <button class="layui-btn" id="btnAdd">
                                 <i class="layui-icon layui-icon-add-1"></i>
                                 新增
@@ -28,7 +28,7 @@
                                 批量删除
                             </button>
                         </div>
-                        <div class="layui-col-md9" style="text-align: right">
+                        <div style="float:right">
                             <div class="layui-inline">
                                 <div class="layui-input-wrap">
                                     <select name="category_id" lay-filter="category-filter">
@@ -42,8 +42,8 @@
                                     <div class="layui-input-prefix">
                                         <i class="layui-icon layui-icon-date"></i>
                                     </div>
-                                    <input type="text" name="date" id="date" lay-verify="date"
-                                           placeholder="开始日" autocomplete="off" class="layui-input">
+                                    <input type="text" name="start_date" id="start_date" lay-verify="date"
+                                           placeholder="开始日" autocomplete="off" class="layui-input date">
                                 </div>
                             </div>
                             <div class="layui-inline">
@@ -51,16 +51,17 @@
                                     <div class="layui-input-prefix">
                                         <i class="layui-icon layui-icon-date"></i>
                                     </div>
-                                    <input type="text" name="date" id="date" lay-verify="date"
-                                           placeholder="结束日" autocomplete="off" class="layui-input">
+                                    <input type="text" name="end_date" id="end_date" lay-verify="date"
+                                           placeholder="结束日" autocomplete="off" class="layui-input date">
                                 </div>
                             </div>
                             <div class="layui-inline">
                                 <div class="layui-input-inline layui-input-wrap">
-                                    <input type="tel" name="phone" lay-verify="required|phone" placeholder="请输入搜索内容"  autocomplete="off" lay-reqtext="请填写手机号" lay-affix="clear" class="layui-input demo-phone">
+                                    <input type="text" name="keyword" placeholder="关键词搜索"
+                                           autocomplete="off" lay-affix="clear" class="layui-input">
                                 </div>
                                 <div class="layui-input-inline" style="padding: 0!important;">
-                                    <button type="button" class="layui-btn"lay-on="get-vercode">
+                                    <button type="button" class="layui-btn" lay-submit lay-filter="search">
                                         <i class="layui-icon layui-icon-search"></i>
                                     </button>
                                 </div>
@@ -98,7 +99,7 @@
             elem: '#newsTable',
             url: '/news/list', // 如果使用 AJAX，可填入数据接口 URL
             page: true, // 开启分页
-            limit: 5, // 每页显示数量
+            limit: 10, // 每页显示数量
             limits: [10, 20, 30], // 分页选项
             cols: [[
                 {type: 'checkbox', fixed: 'left'},
@@ -112,7 +113,7 @@
 
         // 日期
         laydate.render({
-           elem: '#date'
+           elem: '.date'
         });
 
         // 加载分类并初始化下拉菜单
@@ -139,22 +140,42 @@
 
         // 分类筛选事件
         form.on('select(category-filter)', function(data) {
+            var where = {};
+            if (data.value) {
+                where.category_id = data.value;
+            }
             tableIns.reload({
-                where: {
-                    category_id: data.value
-                },
+                where: where,
                 page: {curr: 1}
             });
         });
 
-        // 搜索
-        form.on('submit(formSearch)', function(data) {
+        // 搜索按钮提交事件
+        form.on('submit(search)', function(data) {
+            console.log(data);
+            var where = {};
+
+            // 日期范围
+            if (data.field.start_date) {
+                where.start_date = data.field.start_date;
+            }
+            if (data.field.end_date) {
+                where.end_date = data.field.end_date;
+            }
+
+            // 关键词
+            if (data.field.keyword) {
+                where.keyword = data.field.keyword;
+            }
+
+            //重新加载表格
             tableIns.reload({
-                where: data.field,
-                page: {curr:1}
+                where: where,
+                page: {curr: 1}
             });
+
             return false;
-        });
+        })
 
         // 添加按钮
         $('#btnAdd').click(function() {
