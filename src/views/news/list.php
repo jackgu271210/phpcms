@@ -27,9 +27,7 @@
                                 <i class="layui-icon layui-icon-delete"></i>
                                 批量删除
                             </button>
-                        </div>
-                        <div style="float:right">
-                            <div class="layui-inline">
+                            <div class="category-select layui-inline">
                                 <div class="layui-input-wrap">
                                     <select name="category_id" lay-filter="category-filter">
                                         <option value="所有新闻"></option>
@@ -37,6 +35,8 @@
                                     </select>
                                 </div>
                             </div>
+                        </div>
+                        <div style="float:right">
                             <div class="layui-inline">
                                 <div class="layui-input-wrap">
                                     <div class="layui-input-prefix">
@@ -70,6 +70,14 @@
                     </div>
                 </div>
                 <table id="newsTable" lay-filter="newsTable"></table>
+                <script type="text/html" id="statusTemplate">
+                    <input type="checkbox" lay-skin="switch" lay-text="开启|关闭" lay-filter="statusSwitch"
+                           data-id="{{d.id}}" {{d.status == 1 ? 'checked' : ''}}>
+                </script>
+                <script type="text/html" id="sortTemplate">
+                    <input type="number" name="sort" class="layui-input layui-input-inline sort-input"
+                           value="{{d.sort}}" data-id="{{d.id}}">
+                </script>
                 <script type="text/html" id="toolDemo">
                     <div class="layui-clear-space">
                         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
@@ -106,8 +114,10 @@
                 {field: 'id', title: 'ID', width: 150, sort: true},
                 {field: 'title', title: '标题'},
                 {field: 'category_name', title: '类别'},
+                {field: 'status', title: '状态', width: 100, templet: '#statusTemplate'},
+                {field: 'sort', title: '排序', width: 160, templet: '#sortTemplate'},
                 {field: 'created_at', title: '加入时间', width: 200, sort: true},
-                {fixed: 'right', title:'操作', width: 134, minWidth: 125, templet: '#toolDemo'}
+                {fixed: 'right', title:'操作', width: 110, templet: '#toolDemo'}
             ]]
         });
 
@@ -131,6 +141,9 @@
                         $('select[name="category_id"]').html(html);
                         form.render('select');
                     }
+                },
+                error: function() {
+                    layer.msg('网络错误', {icon:2});
                 }
             });
         }
@@ -152,7 +165,7 @@
 
         // 搜索按钮提交事件
         form.on('submit(search)', function(data) {
-            console.log(data);
+            console.log(data.field);
             var where = {};
 
             // 日期范围
@@ -217,6 +230,21 @@
                 }
             });
         }
+
+        // 状态开关事件
+        form.on('switch(statusSwitch)', function(obj) {
+            var id = $(this).attr('data-id');
+            var status = obj.elem.checked ? 1 : 0;
+            $.ajax({
+                url: '/news/updateStatus',
+                method: 'POST',
+                dataType: 'json',
+                data: {id: id, status: status},
+                success: function(res) {
+                    
+                }
+            })
+        })
 
         // 单个删除数据
         function deleteData(id) {

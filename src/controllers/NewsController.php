@@ -40,11 +40,11 @@ class NewsController {
             'url5' => isset($_POST['url5']) ? trim($_POST['url5']) : ''
         ];
 
-        //验证数据
-        if (empty($data['title']) || $data['category_id'] === 0) {
+        // 验证数据
+        if (empty($data['title'])) {
             echo json_encode([
                 'code' => 1,
-                'msg' => '标题和分类不能为空'
+                'msg' => '标题不能为空'
             ]);
             exit;
         }
@@ -90,7 +90,7 @@ class NewsController {
     public function listNews() {
             $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
             $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
-            $category_id = isset($_GET['category_id']) ? (int)$_GET['category_id'] : null;
+            //$category_id = isset($_GET['category_id']) ? (int)$_GET['category_id'] : null;
             $offset = ($page - 1) * $limit;
 
             // 获取搜索参数
@@ -102,7 +102,7 @@ class NewsController {
                 'limit' => $limit
             ];
 
-            $total = $this->newsModel->getNewsCount($category_id);
+            $total = $this->newsModel->getSearchCount($params);
             $data = $this->newsModel->searchNews($params);
 
             return [

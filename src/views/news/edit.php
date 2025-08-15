@@ -15,7 +15,8 @@ $data = $news ?? [];
                 <div class="layui-form-item">
                     <label class="layui-form-label">标题</label>
                     <div class="layui-input-block">
-                        <input type="text" name="title" value="<?php echo htmlspecialchars($data['title'] ?? ''); ?>"
+                        <input type="text" name="title"
+                               value="<?php echo htmlspecialchars($data['title'] ?? ''); ?>"
                                class="layui-input">
                     </div>
                 </div>
@@ -133,7 +134,7 @@ $data = $news ?? [];
 
             window.editor = createEditor({
                 selector: '#editor-container',
-                html: initialContent || '<p><br></p>',
+                html: initialContent || '',
                 config: editorConfig,
                 mode: 'default',
             });
