@@ -130,6 +130,89 @@ class NewsController {
        require APP_PATH . '/views/news/edit.php';
     }
 
+    public function updateStatus() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'code' => 1,
+                'msg' => '方法不允许'
+            ]);
+            exit;
+        }
+        $id = isset($_POST['id']) ? (int)$_POST['id'] : null;
+        $status = isset($_POST['status']) ? (int)$_POST['status'] : 0;
+
+        if ($id === null) {
+            http_response_code(400);
+            echo json_encode([
+                'code' => 1,
+                'msg' => '无效的ID'
+            ]);
+            exit;
+        }
+
+        try {
+            if ($this->newsModel->updateStatus($id, $status)) {
+                echo json_encode([
+                    'code' => 0,
+                    'msg' => '状态更新成功'
+                ]);
+            } else {
+                echo json_encode([
+                    'code' => 1,
+                    'msg' => '状态更新失败'
+                ]);
+            }
+        } catch(PDOException $e) {
+            echo json_encode ([
+                'code' => 1,
+                'msg' => '状态更新失败: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function updateSort() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'code' => 1,
+                'msg' => '方法不允许'
+            ]);
+            exit;
+        }
+
+        $id = isset($_POST['id']) ? (int)$_POST['id'] : null;
+        $sort = isset($_POST['sort']) ? (int)$_POST['sort'] : 0;
+
+        if ($id === null) {
+            http_response_code(400);
+            echo json_encode([
+               'code' => 1,
+               'msg' => '无效的ID'
+            ]);
+            exit;
+        }
+
+        try {
+            if ($this->newsModel->updateSort($id, $sort)) {
+                echo json_encode([
+                    'code' => 0,
+                    'msg' => '排序更新成功'
+                ]);
+            } else {
+                echo json_encode([
+                    'code' => 1,
+                    'msg' => '排序更新失败'
+                ]);
+            }
+        } catch(PDOException $e) {
+            echo json_encode([
+                'code' => 1,
+                'msg' => '排序更新失败: ' . $e->getMessage()
+            ]);
+        }
+    }
+
     public function delete($id) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
@@ -172,7 +255,7 @@ class NewsController {
             exit;
         }
 
-        $input = json_decode(file_get_contents('php//input'), true);
+        $input = json_decode(file_get_contents('php://input'), true);
         $ids = $input['ids'] ?? [];
 
         if (empty($ids)) {

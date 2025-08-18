@@ -241,7 +241,44 @@
                 dataType: 'json',
                 data: {id: id, status: status},
                 success: function(res) {
-                    
+                    if (res.code === 0) {
+                        layer.msg(res.msg, {icon:1});
+                        tableIns.reload();
+                    } else {
+                        layer.msg(res.msg, {icon:2});
+                        obj.elem.checked = !obj.elem.checked;
+                        form.render('checkbox');
+                    }
+                },
+                error: function() {
+                    layer.msg('请求失败', {icon:2});
+                    obj.elem.checked = !obj.elem.checked;
+                    form.render('checkbox');
+                }
+            })
+        })
+
+        // 排序输入框事件
+        $(document).on('change', '.sort-input', function() {
+            var id = $(this).data('id');
+            var sort = $(this).val();
+
+
+            $.ajax({
+                url: '/news/updateSort',
+                method: 'POST',
+                dataType: 'json',
+                data: {id: id, sort: sort},
+                success: function(res) {
+                    if (res.code === 0) {
+                        layer.msg(res.msg, {icon:1});
+                        tableIns.reload();
+                    } else {
+                        layer.msg(res.msg, {icon:2});
+                    }
+                },
+                error: function() {
+                    layer.msg('请求失败', {icon:2});
                 }
             })
         })

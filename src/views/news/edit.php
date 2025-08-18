@@ -113,13 +113,13 @@ $data = $news ?? [];
                 },
                 MENU_CONF: {
                     uploadImage: {
-                        server: '/news/upload',
+                        server: '/upload',
                         fieldName: 'file',
                         maxFileSize: 20 * 1024 * 1024,
                         allowedFileTypes: ['image/*'],
                         customInsert(res, insertFn) {
-                            if (res.code !== 0) {
-                                layer.msg(res.msg, {icon: 2});
+                            if (res.errno !== 0) {
+                                parent.layer.msg(res.message, {icon: 2});
                                 return;
                             }
                             insertFn(res.data.url);

@@ -40,6 +40,9 @@ switch ($parts[0]) {
     case 'faker':
         require APP_PATH . '/lib/generate_fake_data.php';
         break;
+    case 'upload':
+        require APP_PATH . '/lib/upload.php';
+        break;
     case 'news':
         require APP_PATH . '/controllers/NewsController.php';
         $controller = new NewsController($pdo);
@@ -63,6 +66,12 @@ switch ($parts[0]) {
                 break;
             case 'edit':
                 $controller->edit($id);
+                break;
+            case 'updateSort':
+                $controller->updateSort();
+                break;
+            case 'updateStatus':
+                $controller->updateStatus();
                 break;
             case 'delete':
                 $controller->delete($id);

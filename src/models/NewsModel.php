@@ -171,6 +171,18 @@ class NewsModel
         return $stmt->rowCount();
     }
 
+    public function updateStatus($id, $status) {
+        $sql = "UPDATE news SET status = :status WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([':id' => $id, ':status' => $status]);
+    }
+
+    public function updateSort($id, $sort) {
+        $sql = "UPDATE news SET sort = :sort WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([':id' => $id, ':sort' => $sort]);
+    }
+
     public function getCategories() {
         $stmt = $this->pdo->query("SELECT id, title FROM news_categories");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -204,7 +216,7 @@ class NewsModel
             $sql .= " AND " . implode(" AND ", $conditions);
         }
 
-        $sql .= " ORDER BY n.created_at DESC";
+        $sql .= " ORDER BY CASE WHEN n.sort IS NULL THEN 1 ELSE 0 END, n.sort, n.created_at DESC";
 
         if (isset($params['offset']) && isset($params['limit'])) {
             $sql .= " LIMIT :offset, :limit";
