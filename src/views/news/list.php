@@ -165,7 +165,6 @@
 
         // 搜索按钮提交事件
         form.on('submit(search)', function(data) {
-            console.log(data.field);
             var where = {};
 
             // 日期范围
@@ -316,9 +315,7 @@
                 layer.msg('请至少选择一条记录', {icon:2});
                 return;
             }
-
             layer.confirm('确定要删除选中的' +selectedIds.length + '条记录吗', function(index) {
-                var loading = layer.load();
                 // 发送批量删除请求
                 $.ajax({
                     url: '/news/batchDelete',
@@ -326,8 +323,8 @@
                     contentType: 'application/json',
                     data: JSON.stringify({ids: selectedIds}),
                     success: function(res) {
-                        layer.close(loading);
                         if (res.code === 0) {
+                            console.log('删除成功');
                             layer.msg(res.msg, {icon:1});
                             tableIns.reload();
                         } else {

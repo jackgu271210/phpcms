@@ -54,51 +54,18 @@ class NewsModel
         return $stmt->execute();
     }
 
-    /**
-     * @return mixed
-     * 查看新闻列表
-     */
-    public function getNewsList($offset, $limit, $category_id = null) {
-        $sql = "SELECT n.*, nc.title AS category_name
-                FROM news n
-                LEFT JOIN news_categories nc ON n.category_id = nc.id";
-
-        if ($category_id !== null) {
-            $sql .= " WHERE n.category_id = :category_id";
-        }
-
-        $sql .= " ORDER BY n.created_at DESC LIMIT :offset, :limit";
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-
-        if ($category_id !== null) {
-            $stmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
-        }
-
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function getNewsCount($category_id = null) {
-        $sql = "SELECT COUNT(*) FROM news";
-        if ($category_id !== null) {
-            $sql .= " WHERE category_id = :category_id";
-        }
-        $stmt = $this->pdo->prepare($sql);
-        if ($category_id !== null) {
-            $stmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
-        }
-        $stmt->execute();
-        return $stmt->fetchColumn();
-    }
 
     public function getSearchCount($params) {
         $sql = "SELECT COUNT(*) FROM news n WHERE 1=1";
 
         $conditions = [];
         $bindValues = [];
+
+        // 添加分类筛选
+        if (!empty($params['category_id'])) {
+            $conditions[] = "n.category_id = :category_id";
+            $bindValues[':category_id'] = (int)$params['category_id'];
+        }
 
         // 时间范围筛选
         if (!empty($params['start_date'])) {
@@ -195,6 +162,12 @@ class NewsModel
 
         $conditions = [];
         $bindValues = [];
+
+        // 分类筛选条件
+        if (!empty($params['category_id'])) {
+            $conditions[] = "n.category_id = :category_id";
+            $bindValues[':category_id'] = (int)$params['category_id'];
+        }
 
         // 时间筛选范围
         if (!empty($params['start_date'])) {

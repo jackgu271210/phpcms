@@ -1,10 +1,16 @@
 {
     "require": {
-        "fakerphp/faker": "^1.24"
+        "fakerphp/faker": "^1.24",
+        "altorouter/altorouter": "^2.0"
     },
     "config": {
         "platform": {
             "php": "8.0.2"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
         }
     }
 }

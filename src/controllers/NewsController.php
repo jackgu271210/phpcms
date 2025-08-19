@@ -1,4 +1,8 @@
 <?php
+namespace App\controllers;
+
+use NewsModel;
+
 require_once __DIR__ . '/../models/NewsModel.php';
 
 class NewsController {
@@ -90,7 +94,6 @@ class NewsController {
     public function listNews() {
             $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
             $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
-            //$category_id = isset($_GET['category_id']) ? (int)$_GET['category_id'] : null;
             $offset = ($page - 1) * $limit;
 
             // 获取搜索参数
@@ -98,6 +101,7 @@ class NewsController {
                 'start_date' => isset($_GET['start_date']) ? $_GET['start_date'] : null,
                 'end_date' => isset($_GET['end_date']) ? $_GET['end_date'] : null,
                 'keyword' => isset($_GET['keyword']) ? trim($_GET['keyword']) : null,
+                'category_id' => isset($_GET['category_id']) ? (int)$_GET['category_id'] : null,
                 'offset' => $offset,
                 'limit' => $limit
             ];
@@ -245,6 +249,8 @@ class NewsController {
 
 
     public function batchDelete() {
+        header('Content-Type: application/json');
+
         // 只接受POST请求
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
@@ -257,6 +263,7 @@ class NewsController {
 
         $input = json_decode(file_get_contents('php://input'), true);
         $ids = $input['ids'] ?? [];
+
 
         if (empty($ids)) {
             echo json_encode([

@@ -1,7 +1,7 @@
 <?php
 // index.php - 基础版入口文件
 
-
+require __DIR__ . '/../vendor/autoload.php';
 
 // 1. 设置错误报告
 error_reporting(E_ALL);
@@ -11,13 +11,6 @@ ini_set('display_errors', 1);
 define('ROOT_PATH', __DIR__ . '/..');
 define('APP_PATH', ROOT_PATH . '/src');
 
-// 3. 自动加载
-spl_autoload_register(function ($class) {
-    $file = APP_PATH . '/' . str_replace('\\', '/', $class) . '.php';
-    if (file_exists($file)) {
-        require $file;
-    }
-});
 
 // 4. 启动会话(如果需要)
 session_start();
@@ -26,70 +19,61 @@ require_once APP_PATH . '/../config/database.php';
 
 $pdo = getDbConnection();
 
-// 5. 路由处理
-$request = $_SERVER['REQUEST_URI'];
-$path = parse_url($request, PHP_URL_PATH);
-$query = parse_url($request, PHP_URL_QUERY);
-$path = trim($path, '/');
-$parts = explode('/', $path);
-$action = isset($parts[1]) ? $parts[1] : '';
+// 5. 初始化AltoRouter
+$router = new AltoRouter();
+$router->setBasePath('');
+
+// 6. 定义路由
+use App\controllers\NewsController;
+
+$router->map('GET', '/news', function() use ($pdo) {
+   require APP_PATH . '/views/news/list.php';
+});
+
+$router->map('GET', '/news/categories', function() use ($pdo) {
+   $controller = new NewsController($pdo);
+   $controller->categories();
+});
+
+$router->map('GET', '/news/list', function() use ($pdo) {
+    header('Content-Type: application/json');
+    $controller = new NewsController($pdo);
+    echo json_encode($controller->listNews());
+});
+
+$router->map('POST', '/news/save', function() use ($pdo) {
+   $controller = new NewsController($pdo);
+   $controller->save();
+});
+
+$router->map('GET|POST', '/news/edit/[i:id]', function($id) use ($pdo) {
+    $controller = new NewsController($pdo);
+    $controller->edit($id);
+});
+
+$router->map('POST', '/news/updateSort', function() use ($pdo) {
+   $controller = new NewsController($pdo);
+   $controller->updateSort();
+});
+
+$router->map('POST', '/news/updateStatus', function() use ($pdo) {
+   $controller = new NewsController($pdo);
+   $controller->updateStatus();
+});
 
 
 
-switch ($parts[0]) {
-    case 'faker':
-        require APP_PATH . '/lib/generate_fake_data.php';
-        break;
-    case 'upload':
-        require APP_PATH . '/lib/upload.php';
-        break;
-    case 'news':
-        require APP_PATH . '/controllers/NewsController.php';
-        $controller = new NewsController($pdo);
-        $id = isset($parts[2]) ? (int)$parts[2] : null;
+$router->map('GET', '/faker', function() {
+   require APP_PATH . '/lib/generate_fake_data.php';
+});
 
-        switch ($action) {
-            case '':
-                require APP_PATH . '/views/news/list.php';
-                break;
-            case 'categories':
-                $controller->categories();
-                break;
-            case 'list':
-                // 提供表格数据的 JSON 接口
-                header('Content-Type: application/json');
-                echo json_encode($controller->listNews());
-                exit; // 确保退出，避免多余输出
-                break;
-            case 'save':
-                $controller->save();
-                break;
-            case 'edit':
-                $controller->edit($id);
-                break;
-            case 'updateSort':
-                $controller->updateSort();
-                break;
-            case 'updateStatus':
-                $controller->updateStatus();
-                break;
-            case 'delete':
-                $controller->delete($id);
-                break;
-            case 'batchDelete':
-                $controller->batchDelete();
-                break;
-            default:
-                http_response_code(404);
-                require APP_PATH . '/views/404.php';
-                break;
-        }
-        break;
-    case '':
-        require APP_PATH . '/views/index.php';
-        break;
-    default:
-        http_response_code(404);
-        require APP_PATH . '/views/404.php';
-        break;
+// 路由匹配和处理
+$match = $router->match();
+
+if ($match && is_callable($match['target'])) {
+    call_user_func_array($match['target'], $match['params']);
+} else {
+    // 匹配没有的路由，显示404
+    http_response_code(404);
+    require APP_PATH . '/views/404.php';
 }
