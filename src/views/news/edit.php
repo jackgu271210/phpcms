@@ -35,8 +35,9 @@ $data = $news ?? [];
                 <div class="layui-form-item">
                     <label class="layui-form-label">网页描述</label>
                     <div class="layui-input-block">
-                        <textarea name="description" class="layui-textarea">
-                            <?php echo htmlspecialchars($data['description'] ?? ''); ?>
+                        <textarea name="description" class="layui-textarea"><?php
+                            echo htmlspecialchars($data['description'] ?? '');
+                            ?>
                         </textarea>
                     </div>
                 </div>
@@ -54,8 +55,9 @@ $data = $news ?? [];
                             <div id="toolbar-container"><!-- 工具栏 --></div>
                             <div id="editor-container"><!-- 编辑器 --></div>
                         </div>
-                        <textarea name="content" id="editor-content" style="display:none;">
-                            <?php echo htmlspecialchars($data['content'] ?? ''); ?>
+                        <textarea name="content" id="editor-content" style="display:none;"><?php
+                            echo htmlspecialchars($data['content'] ?? '');
+                            ?>
                         </textarea>
                     </div>
                 </div>

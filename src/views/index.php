@@ -1,89 +1,20 @@
 
-<!--style-->
-<?php require_once APP_PATH . '/views/layouts/style.php' ?>
-<!--style-->
+<!--头部-->
+<?php require_once APP_PATH . '/views/layouts/header.php' ?>
+<!--头部-->
+
+<!--侧边栏-->
+<?php require_once APP_PATH . '/views/layouts/sidebar.php' ?>
+<!--侧边栏-->
 
 <!--内容主题-->
-    <div class="layui-card layui-panel">
-        <div class="layui-card-header">
-            <h2 class="">新闻列表</h2>
-        </div>
-        <div class="layui-card-body">
-            <div class="layui-table-view layui-block layui-form layui-border-box">
-                <div class="layui-row layui-table-tool">
-                    <div style="float:left">
-                        <button class="layui-btn" id="btnAdd">
-                            <i class="layui-icon layui-icon-add-1"></i>
-                            新增
-                        </button>
-                        <button class="layui-btn layui-btn-danger" id="btnBatchDelete">
-                            <i class="layui-icon layui-icon-delete"></i>
-                            批量删除
-                        </button>
-                        <div class="category-select layui-inline">
-                            <div class="layui-input-wrap">
-                                <select name="category_id" lay-filter="category-filter">
-                                    <option value="所有新闻"></option>
-                                    <!--动态分类数据将通过JS提供-->
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="float:right">
-                        <div class="layui-inline">
-                            <div class="layui-input-wrap">
-                                <div class="layui-input-prefix">
-                                    <i class="layui-icon layui-icon-date"></i>
-                                </div>
-                                <input type="text" name="start_date" id="start_date" lay-verify="date"
-                                       placeholder="开始日" autocomplete="off" class="layui-input date">
-                            </div>
-                        </div>
-                        <div class="layui-inline">
-                            <div class="layui-input-wrap">
-                                <div class="layui-input-prefix">
-                                    <i class="layui-icon layui-icon-date"></i>
-                                </div>
-                                <input type="text" name="end_date" id="end_date" lay-verify="date"
-                                       placeholder="结束日" autocomplete="off" class="layui-input date">
-                            </div>
-                        </div>
-                        <div class="layui-inline">
-                            <div class="layui-input-inline layui-input-wrap">
-                                <input type="text" name="keyword" placeholder="关键词搜索"
-                                       autocomplete="off" lay-affix="clear" class="layui-input">
-                            </div>
-                            <div class="layui-input-inline" style="padding: 0!important;">
-                                <button type="button" class="layui-btn" lay-submit lay-filter="search">
-                                    <i class="layui-icon layui-icon-search"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <table id="newsTable" lay-filter="newsTable"></table>
-            <script type="text/html" id="statusTemplate">
-                <input type="checkbox" lay-skin="switch" lay-text="开启|关闭" lay-filter="statusSwitch"
-                       data-id="{{d.id}}" {{d.status == 1 ? 'checked' : ''}}>
-            </script>
-            <script type="text/html" id="sortTemplate">
-                <input type="number" name="sort" class="layui-input layui-input-inline sort-input"
-                       value="{{d.sort}}" data-id="{{d.id}}">
-            </script>
-            <script type="text/html" id="toolDemo">
-                <div class="layui-clear-space">
-                    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
-                </div>
-            </script>
-        </div>
+<div class="layui-body">
+    <div id="main-tabs">
     </div>
-<!--内容主题-->
 
-<!--SCRIPT-->
-<?php require_once APP_PATH .  '/views/layouts/script.php' ?>
-<!--SCRIPT-->
+<!--底部-->
+<?php require_once APP_PATH . '/views/layouts/footer.php' ?>
+<!--底部-->
 <script>
     layui.use(['table', 'form', 'laydate', 'tabs', 'layer'], function() {
         var table = layui.table;
@@ -95,15 +26,13 @@
 
         // 初始化选项卡
         var mainTab = tabs.render({
-            elem: '.layui-tabs',
-            filter: 'main-tabs',
-            allowClose: true,
-            onSwitch: function(data) {
-                console.log('切换到选项卡:', data);
-            },
-            onClose: function(data) {
-                console.log("关闭选项卡", data);
-            }
+            elem: '#main-tabs',
+            closable: true,
+            header: [
+            ],
+            body: [
+            ],
+            index: 0, // 初始选中标签索引
         });
 
         // 侧边栏点击事件
@@ -111,15 +40,15 @@
            e.preventDefault();
 
            var url = $(this).data('url');
+            console.log(url);
            var title = $(this).data('title') || '新页面';
-           var icon = $(this).find('.layui-icon').attr('class') || 'layui-icon-file';
 
            // 打开选项卡
-            openTab(title, url, icon);
+            openTab(title, url);
         });
 
         // 打开选项卡函数
-        function openTab(title, url, icon) {
+        function openTab(title, url) {
             var tabId = 'tab_' + Math.random().toString(36).substr(2);
 
             // 检查是否已存在相同标题的选项卡
@@ -138,18 +67,11 @@
             if (!exists) {
                 // 添加新选项卡
                 tabs.add('main-tabs', {
-                    title: 'New Tab 1',
-                    content: 'New Tab Content 1',
-                    done: function(data) {
-                        console.log(data); // 标签相关数据
-                        // 为新标签头添加任意属性
-                        data.headerItem.attr('lay-tips', '111');
-                    }
-                   // id: tabId,
-                   // title: '<i class=" ' +icon+ ' "></i>' + title,
-                   //  content: '<iframe src=" ' +url+ ' " frameborder="0" class="layui-frame"></iframe>'
+                    id: tabId,
+                    title: title,
+                    content: '<iframe src=" ' +url+ ' " frameborder="0" class="layui-frame"></iframe>'
                 });
-
+                console.log(tabId);
                 // 切换到新选项卡
                 tabs.change('main-tabs', tabId);
             }

@@ -26,6 +26,7 @@ $router->setBasePath('');
 // 6. 定义路由
 use App\controllers\NewsController;
 
+// 新闻路由
 $router->map('GET', '/news', function() use ($pdo) {
    require APP_PATH . '/views/news/list.php';
 });
@@ -46,6 +47,11 @@ $router->map('POST', '/news/save', function() use ($pdo) {
    $controller->save();
 });
 
+$router->map('GET', '/news/add', function() use ($pdo) {
+   $controller = new NewsController($pdo);
+   $controller->edit(null);
+});
+
 $router->map('GET|POST', '/news/edit/[i:id]', function($id) use ($pdo) {
     $controller = new NewsController($pdo);
     $controller->edit($id);
@@ -61,10 +67,30 @@ $router->map('POST', '/news/updateStatus', function() use ($pdo) {
    $controller->updateStatus();
 });
 
+$router->map('POST', '/news/delete/[i:id]', function($id) use ($pdo) {
+   $controller = new NewsController($pdo);
+   $controller->delete($id);
+});
 
+$router->map('POST','/news/batchDelete', function() use ($pdo) {
+    $controller = new NewsController($pdo);
+    $controller->batchDelete();
+});
+
+
+// 其他路由
 
 $router->map('GET', '/faker', function() {
    require APP_PATH . '/lib/generate_fake_data.php';
+});
+
+$router->map('GET|POST', '/upload', function() {
+    require APP_PATH . '/lib/upload.php';
+});
+
+// 首页路由
+$router->map('GET', '/', function() {
+   require APP_PATH . '/views/index.php';
 });
 
 // 路由匹配和处理

@@ -1,3 +1,4 @@
+
 #editor—wrapper {
     border: 1px solid #ccc;
     z-index: 100; /* 按需定义 */
@@ -10,4 +11,57 @@
 }
 .category-select {
     margin-left: 10px;
+}
+.layui-block {
+    border: none;
+    background-color: #f2f2f2;
+    margin-bottom: 15px;
+}
+.layui-table-header tr{
+    background-color: #16baaa;
+}
+.layui-table-header tr span {
+    color: #fff;
+}
+.layui-table-header .layui-table-sort .layui-table-sort-asc
+{
+    border-bottom-color: #fff;
+}
+.layui-table-header .layui-table-sort .layui-table-sort-desc
+{
+    border-top-color: #fff;
+}
+
+.layui-panel {
+    border: none;
+}
+
+.layui-table-box td, .layui-table th {
+    padding: 9px 15px;
+    min-height: 20px;
+    line-height: 20px;
+    border: 1px solid #e2e2e2;
+    font-size: 14px;
+    text-align: center;
+}
+.layui-table-cell {
+    height: auto;
+}
+.layui-table-page .layui-laypage a, .layui-table-page .layui-laypage span.layui-laypage-curr {
+    padding: 0 16px;
+}
+
+.layui-table-page .layui-laypage a, .layui-table-page .layui-laypage span {
+    height: 30px;
+    line-height: 30px;
+}
+.layui-table-page > div {
+    height: 30px;
+}
+.layui-frame {
+    width: 100%;
+    height: calc(100vh - 60px);
+}
+.layui-tabs-header {
+    background-color: #f2f2f2;
 }
