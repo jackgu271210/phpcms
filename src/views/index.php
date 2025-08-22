@@ -11,6 +11,7 @@
 <div class="layui-body">
     <div id="main-tabs">
     </div>
+</div>
 
 <!--底部-->
 <?php require_once APP_PATH . '/views/layouts/footer.php' ?>
@@ -53,7 +54,7 @@
 
             // 检查是否已存在相同标题的选项卡
             var exists = false;
-            $('.layui-tab-title li').each(function() {
+            $('.layui-tabs-header li').each(function() {
                 var tabTitle = $(this).text().trim();
                 if (tabTitle === title) {
                     exists = true;
@@ -71,47 +72,46 @@
                     title: title,
                     content: '<iframe src=" ' +url+ ' " frameborder="0" class="layui-frame"></iframe>'
                 });
-                console.log(tabId);
                 // 切换到新选项卡
-                tabs.change('main-tabs', tabId);
+                // tabs.change('main-tabs', tabId);
             }
         }
 
-        // 全局关闭当前选项卡
-        window.closeCurrentTab = function() {
-            var currentTab = $('.layui-tab-title .alyui-tab-active');
-            var tabId = currentTab.attr('lay-id');
-
-            // 不能关闭首页
-            if (tabId !== 'home') {
-                tabs.tabDelete('main-tabs', tabId);
-            }
-        };
-
-        // 关闭指定选项卡
-        window.closeTab = function(tabId) {
-            tabs.tabDelete('main-tabs', tabId);
-        };
-
-        // 刷新当前选项卡
-        window.reloadCurrentTab = function() {
-          var currentTab = $('.layui-tab-title .layui-tab-active');
-          var iframe = currentTab.closest('.layui-tab-item').find('iframe');
-          if (iframe.length) {
-              iframe[0].contentWindow.loaction.reload();
-          }
-        };
-
-        // 监听自定义关闭事件
-        $('body').on('click', '.layui-tab-close', function(e) {
-           e.stopPropagation();
-           var li = $(this).closest('li');
-           var tabId = li.attr('lay-id');
-
-           if (tabId !== 'home') {
-               tabs.tabDelete('main-tabs', tabId);
-           }
-        });
+        // // 全局关闭当前选项卡
+        // window.closeCurrentTab = function() {
+        //     var currentTab = $('.layui-tab-title .alyui-tab-active');
+        //     var tabId = currentTab.attr('lay-id');
+        //
+        //     // 不能关闭首页
+        //     if (tabId !== 'home') {
+        //         tabs.tabDelete('main-tabs', tabId);
+        //     }
+        // };
+        //
+        // // 关闭指定选项卡
+        // window.closeTab = function(tabId) {
+        //     tabs.tabDelete('main-tabs', tabId);
+        // };
+        //
+        // // 刷新当前选项卡
+        // window.reloadCurrentTab = function() {
+        //   var currentTab = $('.layui-tab-title .layui-tab-active');
+        //   var iframe = currentTab.closest('.layui-tab-item').find('iframe');
+        //   if (iframe.length) {
+        //       iframe[0].contentWindow.loaction.reload();
+        //   }
+        // };
+        //
+        // // 监听自定义关闭事件
+        // $('body').on('click', '.layui-tab-close', function(e) {
+        //    e.stopPropagation();
+        //    var li = $(this).closest('li');
+        //    var tabId = li.attr('lay-id');
+        //
+        //    if (tabId !== 'home') {
+        //        tabs.tabDelete('main-tabs', tabId);
+        //    }
+        // });
 
         // 初始化表格
         window.tableIns = table.render({

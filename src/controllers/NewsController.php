@@ -14,7 +14,33 @@ class NewsController {
         $this->newsModel = new NewsModel($pdo);
     }
 
-    public function save() {
+    public function index() {
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $offset = ($page - 1) * $limit;
+
+        // 获取搜索参数
+        $params = [
+            'start_date' => isset($_GET['start_date']) ? $_GET['start_date'] : null,
+            'end_date' => isset($_GET['end_date']) ? $_GET['end_date'] : null,
+            'keyword' => isset($_GET['keyword']) ? trim($_GET['keyword']) : null,
+            'category_id' => isset($_GET['category_id']) ? (int)$_GET['category_id'] : null,
+            'offset' => $offset,
+            'limit' => $limit
+        ];
+
+        $total = $this->newsModel->search($params);
+        $data = $this->newsModel->count($params);
+
+        return [
+            'code' => 0,
+            'msg' => '',
+            'count' => $total,
+            'data' => $data
+        ];
+    }
+
+    public function store() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(403);
             echo json_encode([
@@ -56,13 +82,13 @@ class NewsController {
         //调用模型保存数据
         try {
             if ($id) {
-                $this->newsModel->updateNews($id, $data);
+                $this->newsModel->update($id, $data);
                 echo json_encode([
                     'code' => 0,
                     'msg' => '更新成功'
                 ]);
             } else {
-                $this->newsModel->saveNews(
+                $this->newsModel->create(
                     $data['title'], $data['category_id'], $data['description'], $data['keyword'], $data['content'],
                     $data['key1'], $data['url1'], $data['key2'], $data['url2'], $data['key3'], $data['url3'],
                     $data['key4'], $data['url4'], $data['key5'], $data['url5']
@@ -91,39 +117,13 @@ class NewsController {
         ]);
     }
 
-    public function listNews() {
-            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-            $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
-            $offset = ($page - 1) * $limit;
-
-            // 获取搜索参数
-            $params = [
-                'start_date' => isset($_GET['start_date']) ? $_GET['start_date'] : null,
-                'end_date' => isset($_GET['end_date']) ? $_GET['end_date'] : null,
-                'keyword' => isset($_GET['keyword']) ? trim($_GET['keyword']) : null,
-                'category_id' => isset($_GET['category_id']) ? (int)$_GET['category_id'] : null,
-                'offset' => $offset,
-                'limit' => $limit
-            ];
-
-            $total = $this->newsModel->getSearchCount($params);
-            $data = $this->newsModel->searchNews($params);
-
-            return [
-                'code' => 0,
-                'msg' => '',
-                'count' => $total,
-                'data' => $data
-            ];
-    }
-
     public function edit($id = null) {
        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
            $this->save();
            exit;
        }
 
-       $news = $id ? $this->newsModel->getNewsById($id) : [];
+       $news = $id ? $this->newsModel->find($id) : [];
        if ($id && !$news) {
            http_response_code(404);
            require APP_PATH . '/views/404.php';
@@ -133,6 +133,100 @@ class NewsController {
        $categories = $this->newsModel->getCategories();
        require APP_PATH . '/views/news/edit.php';
     }
+
+    public function destory($id) {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'code' => 1,
+                'msg' => '方法不允许'
+            ]);
+            exit;
+        }
+        try {
+            $affectedRows = $this->newsModel->delete($id);
+            if ($affectedRows > 0) {
+                echo json_encode([
+                    'code' => 0,
+                    'msg' => '新闻删除成功'
+                ]);
+            } else {
+                echo json_encode([
+                    'code' => 1,
+                    'msg' => '新闻删除失败'
+                ]);
+            }
+        } catch (PDOException $e) {
+            echo json_encode([
+                'code' => 1,
+                'msg' => '新闻删除失败：' . $e->getMessage()
+            ]);
+        }
+    }
+
+
+    public function batchDestory() {
+        header('Content-Type: application/json');
+
+        // 只接受POST请求
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'code' => 1,
+                'msg' => '方法不允许'
+            ]);
+            exit;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        $ids = $input['ids'] ?? [];
+
+
+        if (empty($ids)) {
+            echo json_encode([
+               'code' => 1,
+               'msg' => '请至少选择一条记录'
+            ]);
+            exit;
+        }
+
+        // 过滤非数字ID
+        $ids = array_filter($ids, function($id) {
+            return is_numeric($id);
+        });
+
+        if (empty($ids)) {
+            echo json_encode([
+                'code' => 1,
+                'msg' => '无效ID'
+            ]);
+            exit;
+        }
+
+        try {
+            // 调用模型进行批量删除
+            $affectedRows = $this->newsModel->deleteMultiple($ids);
+
+            if ($affectedRows > 0) {
+                echo json_encode([
+                   'code' => 0,
+                   'msg' => '成功删除' . $affectedRows . '条记录'
+                ]);
+            } else {
+                echo json_encode([
+                   'code' => 1,
+                   'msg' => '删除失败，记录可能不存在'
+                ]);
+            }
+        } catch (PDOException $e) {
+            http_response_code(500);
+            echo json_encode([
+                'code' => 1,
+                'msg' => '删除失败' . $e->getMessage()
+            ]);
+        }
+    }
+
 
     public function updateStatus() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -191,8 +285,8 @@ class NewsController {
         if ($id === null) {
             http_response_code(400);
             echo json_encode([
-               'code' => 1,
-               'msg' => '无效的ID'
+                'code' => 1,
+                'msg' => '无效的ID'
             ]);
             exit;
         }
@@ -217,96 +311,4 @@ class NewsController {
         }
     }
 
-    public function delete($id) {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            echo json_encode([
-                'code' => 1,
-                'msg' => '方法不允许'
-            ]);
-            exit;
-        }
-        try {
-            $affectedRows = $this->newsModel->deleteNews($id);
-            if ($affectedRows > 0) {
-                echo json_encode([
-                    'code' => 0,
-                    'msg' => '新闻删除成功'
-                ]);
-            } else {
-                echo json_encode([
-                    'code' => 1,
-                    'msg' => '新闻删除失败'
-                ]);
-            }
-        } catch (PDOException $e) {
-            echo json_encode([
-                'code' => 1,
-                'msg' => '新闻删除失败：' . $e->getMessage()
-            ]);
-        }
-    }
-
-
-    public function batchDelete() {
-        header('Content-Type: application/json');
-
-        // 只接受POST请求
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            echo json_encode([
-                'code' => 1,
-                'msg' => '方法不允许'
-            ]);
-            exit;
-        }
-
-        $input = json_decode(file_get_contents('php://input'), true);
-        $ids = $input['ids'] ?? [];
-
-
-        if (empty($ids)) {
-            echo json_encode([
-               'code' => 1,
-               'msg' => '请至少选择一条记录'
-            ]);
-            exit;
-        }
-
-        // 过滤非数字ID
-        $ids = array_filter($ids, function($id) {
-            return is_numeric($id);
-        });
-
-        if (empty($ids)) {
-            echo json_encode([
-                'code' => 1,
-                'msg' => '无效ID'
-            ]);
-            exit;
-        }
-
-        try {
-            // 调用模型进行批量删除
-            $affectedRows = $this->newsModel->batchDelete($ids);
-
-            if ($affectedRows > 0) {
-                echo json_encode([
-                   'code' => 0,
-                   'msg' => '成功删除' . $affectedRows . '条记录'
-                ]);
-            } else {
-                echo json_encode([
-                   'code' => 1,
-                   'msg' => '删除失败，记录可能不存在'
-                ]);
-            }
-        } catch (PDOException $e) {
-            http_response_code(500);
-            echo json_encode([
-                'code' => 1,
-                'msg' => '删除失败' . $e->getMessage()
-            ]);
-        }
-    }
 }

@@ -10,6 +10,7 @@ ini_set('display_errors', 1);
 // 2. 定义常量
 define('ROOT_PATH', __DIR__ . '/..');
 define('APP_PATH', ROOT_PATH . '/src');
+define('ROUTES_PATH', APP_PATH . '/routes');
 
 
 // 4. 启动会话(如果需要)
@@ -26,57 +27,69 @@ $router->setBasePath('');
 // 6. 定义路由
 use App\controllers\NewsController;
 
+// 引入路由加载器
+require_once ROUTES_PATH . '/loader.php';
+
+// 按模块记载路由
+loadRoutes($router, $pdo, ROUTES_PATH . '/web.php');
+loadRoutes($router, $pdo, ROUTES_PATH . '/api.php');
+loadRoutes($router, $pdo, ROUTES_PATH . '/news.php');
+
+
 // 新闻路由
-$router->map('GET', '/news', function() use ($pdo) {
-   require APP_PATH . '/views/news/list.php';
-});
-
-$router->map('GET', '/news/categories', function() use ($pdo) {
-   $controller = new NewsController($pdo);
-   $controller->categories();
-});
-
-$router->map('GET', '/news/list', function() use ($pdo) {
-    header('Content-Type: application/json');
-    $controller = new NewsController($pdo);
-    echo json_encode($controller->listNews());
-});
-
-$router->map('POST', '/news/save', function() use ($pdo) {
-   $controller = new NewsController($pdo);
-   $controller->save();
-});
-
-$router->map('GET', '/news/add', function() use ($pdo) {
-   $controller = new NewsController($pdo);
-   $controller->edit(null);
-});
-
-$router->map('GET|POST', '/news/edit/[i:id]', function($id) use ($pdo) {
-    $controller = new NewsController($pdo);
-    $controller->edit($id);
-});
-
-$router->map('POST', '/news/updateSort', function() use ($pdo) {
-   $controller = new NewsController($pdo);
-   $controller->updateSort();
-});
-
-$router->map('POST', '/news/updateStatus', function() use ($pdo) {
-   $controller = new NewsController($pdo);
-   $controller->updateStatus();
-});
-
-$router->map('POST', '/news/delete/[i:id]', function($id) use ($pdo) {
-   $controller = new NewsController($pdo);
-   $controller->delete($id);
-});
-
-$router->map('POST','/news/batchDelete', function() use ($pdo) {
-    $controller = new NewsController($pdo);
-    $controller->batchDelete();
-});
-
+//$router->map('GET', '/news', function() use ($pdo) {
+//   require APP_PATH . '/views/news/list.php';
+//});
+//
+//$router->map('GET', '/news/categories', function() use ($pdo) {
+//   $controller = new NewsController($pdo);
+//   $controller->categories();
+//});
+//
+//$router->map('GET', '/news/list', function() use ($pdo) {
+//    header('Content-Type: application/json');
+//    $controller = new NewsController($pdo);
+//    echo json_encode($controller->listNews());
+//});
+//
+//$router->map('POST', '/news/save', function() use ($pdo) {
+//   $controller = new NewsController($pdo);
+//   $controller->save();
+//});
+//
+//$router->map('GET', '/news/add', function() use ($pdo) {
+//   $controller = new NewsController($pdo);
+//   $controller->edit(null);
+//});
+//
+//$router->map('GET|POST', '/news/edit/[i:id]', function($id) use ($pdo) {
+//    $controller = new NewsController($pdo);
+//    $controller->edit($id);
+//});
+//
+//$router->map('POST', '/news/updateSort', function() use ($pdo) {
+//   $controller = new NewsController($pdo);
+//   $controller->updateSort();
+//});
+//
+//$router->map('POST', '/news/updateStatus', function() use ($pdo) {
+//   $controller = new NewsController($pdo);
+//   $controller->updateStatus();
+//});
+//
+//$router->map('POST', '/news/delete/[i:id]', function($id) use ($pdo) {
+//   $controller = new NewsController($pdo);
+//   $controller->delete($id);
+//});
+//
+//$router->map('POST','/news/batchDelete', function() use ($pdo) {
+//    $controller = new NewsController($pdo);
+//    $controller->batchDelete();
+//});
+//
+//
+//
+//
 
 // 其他路由
 
@@ -86,11 +99,6 @@ $router->map('GET', '/faker', function() {
 
 $router->map('GET|POST', '/upload', function() {
     require APP_PATH . '/lib/upload.php';
-});
-
-// 首页路由
-$router->map('GET', '/', function() {
-   require APP_PATH . '/views/index.php';
 });
 
 // 路由匹配和处理

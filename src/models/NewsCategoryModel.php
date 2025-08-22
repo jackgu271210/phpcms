@@ -1,6 +1,6 @@
 <?php
 
-class NewsModel
+class NewsCategoryModel
 {
     private $pdo;
 
@@ -28,28 +28,16 @@ class NewsModel
      * @return mixed
      * 添加新闻
      */
-    public function create($title, $category_id, $description, $keyword, $content, $key1, $url1, $key2, $url2, $key3, $url3, $key4, $url4, $key5, $url5)
+    public function create($title, $description, $keyword)
     {
 
-        $sql = "INSERT INTO news (title, category_id, description, keyword, content, key1, url1, key2, url2, key3, url3, key4, url4, key5, url5, created_at)
-        VALUES (:title, :category_id, :description, :keyword, :content, :key1, :url1, :key2, :url2, :key3, :url3, :key4, :url4, :key5, :url5, NOW())";
+        $sql = "INSERT INTO news (title, description, keyword, created_at)
+        VALUES (:title, :description, :keyword, NOW())";
         $stmt = $this->pdo->prepare($sql);
 
         $stmt->bindParam(':title', $title);
-        $stmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
         $stmt->bindParam(':description', $description);
         $stmt->bindParam(':keyword', $keyword);
-        $stmt->bindParam(':content', $content);
-        $stmt->bindParam(':key1', $key1);
-        $stmt->bindParam(':url1', $url1);
-        $stmt->bindParam(':key2', $key2);
-        $stmt->bindParam(':url2', $url2);
-        $stmt->bindParam(':key3', $key3);
-        $stmt->bindParam(':url3', $url3);
-        $stmt->bindParam(':key4', $key4);
-        $stmt->bindParam(':url4', $url4);
-        $stmt->bindParam(':key5', $key5);
-        $stmt->bindParam(':url5', $url5);
 
         return $stmt->execute();
     }
