@@ -1,6 +1,6 @@
 <?php
 
-class NewsCategoryModel
+class ProductCategoryModel
 {
     private $pdo;
 
@@ -31,7 +31,7 @@ class NewsCategoryModel
     public function create($title, $description, $keyword)
     {
 
-        $sql = "INSERT INTO news_categories (title, description, keyword, created_at)
+        $sql = "INSERT INTO product_categories (title, description, keyword, created_at)
         VALUES (:title, :description, :keyword, NOW())";
         $stmt = $this->pdo->prepare($sql);
 
@@ -43,8 +43,9 @@ class NewsCategoryModel
     }
 
 
-    public function count($params) {
-        $sql = "SELECT COUNT(*) FROM news_categories WHERE 1=1";
+    public function count($params)
+    {
+        $sql = "SELECT COUNT(*) FROM product_categories WHERE 1=1";
 
         $conditions = [];
         $bindValues = [];
@@ -81,16 +82,18 @@ class NewsCategoryModel
 
     }
 
-    public function find($id) {
-        $sql = "SELECT * FROM news_categories WHERE id = :id";
+    public function find($id)
+    {
+        $sql = "SELECT * FROM product_categories WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function update($id, $data) {
-        $sql = "UPDATE news_categories SET 
+    public function update($id, $data)
+    {
+        $sql = "UPDATE product_categories SET 
                            title = :title, 
                            description = :description, 
                            keyword = :keyword
@@ -105,26 +108,30 @@ class NewsCategoryModel
         return $stmt->rowCount();
     }
 
-    public function updateStatus($id, $status) {
-        $sql = "UPDATE news_categories SET status = :status WHERE id = :id";
+    public function updateStatus($id, $status)
+    {
+        $sql = "UPDATE product_categories SET status = :status WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([':id' => $id, ':status' => $status]);
     }
 
-    public function updateSort($id, $sort) {
-        $sql = "UPDATE news_categories SET sort = :sort WHERE id = :id";
+    public function updateSort($id, $sort)
+    {
+        $sql = "UPDATE product_categories SET sort = :sort WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([':id' => $id, ':sort' => $sort]);
     }
 
-    public function getCategories() {
-        $sql = "SELECT id, title FROM news_categories ORDER BY COALESCE(sort, 9999), title";
+    public function getCategories()
+    {
+        $sql = "SELECT id, title FROM product_categories ORDER BY COALESCE(sort, 9999), title";
         $stmt = $this->pdo->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function search($params) {
-        $sql = "SELECT * FROM news_categories WHERE 1=1";
+    public function search($params)
+    {
+        $sql = "SELECT * FROM product_categories WHERE 1=1";
 
         $conditions = [];
         $bindValues = [];
@@ -160,7 +167,7 @@ class NewsCategoryModel
         $stmt = $this->pdo->prepare($sql);
 
         foreach ($bindValues as $key => $value) {
-            $paramType = is_int($value) ? PDO::PARAM_INT :PDO::PARAM_STR;
+            $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
             $stmt->bindValue($key, $value, $paramType);
         }
 
@@ -173,20 +180,22 @@ class NewsCategoryModel
      * @return mixed
      * 删除新闻
      */
-    public function delete($id) {
-        $stmt = $this->pdo->prepare("DELETE FROM news_categories WHERE id = :id");
+    public function delete($id)
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM product_categories WHERE id = :id");
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
     }
 
-  public function deleteMultiple(array $ids) {
+    public function deleteMultiple(array $ids)
+    {
         // 创建ID占位符
-      $placeholders = implode(',', array_fill(0,count($ids), '?'));
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
 
-      $sql = "DELETE FROM news_categories WHERE id IN ($placeholders)";
-      $stmt = $this->pdo->prepare($sql);
-      $stmt->execute($ids);
+        $sql = "DELETE FROM product_categories WHERE id IN ($placeholders)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($ids);
 
-      return $stmt->rowCount();
-  }
+        return $stmt->rowCount();
+    }
 }

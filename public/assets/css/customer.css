@@ -68,3 +68,9 @@
 .layui-btn-xs i {
     font-size: 15px !important;
 }
+.layui-form-label {
+    width: 112px;
+}
+.layui-input-block {
+    margin-left: 142px;
+}

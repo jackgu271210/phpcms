@@ -17,14 +17,6 @@
                         <i class="layui-icon layui-icon-delete"></i>
                         批量删除
                     </button>
-                    <div class="category-select layui-inline">
-                        <div class="layui-input-wrap">
-                            <select name="category_id" lay-filter="category-filter">
-                                <option value="所有新闻"></option>
-                                <!--动态分类数据将通过JS提供-->
-                            </select>
-                        </div>
-                    </div>
                 </div>
                 <div style="float:right">
                     <div class="layui-inline">
@@ -195,7 +187,7 @@
         // 初始化表格
         window.tableIns = table.render({
             elem: '#newsTable',
-            url: '/api/news/list', // 如果使用 AJAX，可填入数据接口 URL
+            url: '/api/product-category/list', // 如果使用 AJAX，可填入数据接口 URL
             page: true, // 开启分页
             limit: 10, // 每页显示数量
             limits: [10, 20, 30], // 分页选项
@@ -203,7 +195,6 @@
                 {type: 'checkbox'},
                 {field: 'id', title: 'ID', width: 150, sort: true},
                 {field: 'title', title: '标题'},
-                {field: 'category_name', title: '类别'},
                 {field: 'status', title: '状态', width: 100, templet: '#statusTemplate'},
                 {field: 'sort', title: '排序', width: 160, templet: '#sortTemplate'},
                 {field: 'created_at', title: '加入时间', width: 200, sort: true},
@@ -214,43 +205,6 @@
         // 日期
         laydate.render({
             elem: '.date'
-        });
-
-        // 加载分类并初始化下拉菜单
-        function loadCategories() {
-            $.ajax({
-                url: '/api/news/categories',
-                type: 'GET',
-                dataType: 'json',
-                success: function (res) {
-                    if (res.code === 0) {
-                        var html = '<option value="">所有新闻</option>';
-                        $.each(res.data, function (index, item) {
-                            html += '<option value="' + item.id + '">' + item.title + '</option>'
-                        });
-                        $('select[name="category_id"]').html(html);
-                        form.render('select');
-                    }
-                },
-                error: function () {
-                    layer.msg('网络错误', {icon: 2});
-                }
-            });
-        }
-
-        // 页面加载完成后初始化分类下拉框
-        loadCategories();
-
-        // 分类筛选事件
-        form.on('select(category-filter)', function (data) {
-            var where = {};
-            if (data.value) {
-                where.category_id = data.value;
-            }
-            tableIns.reload({
-                where: where,
-                page: {curr: 1}
-            });
         });
 
         // 搜索按钮提交事件
@@ -298,12 +252,12 @@
         function showForm(data) {
             data = data || {};
             var id = data.id;
-            var url = id ? '/api/news/edit/' + id : '/api/news/create';
-            var title = id ? '编辑新闻' : '添加新闻';
+            var url = id ? '/api/product-category/edit/' + id : '/api/product-category/create';
+            var title = id ? '编辑产品' : '添加产品';
             layer.open({
                 type: 2,
                 title: title,
-                area: ['80%', '80%'],
+                area: ['80%', '40%'],
                 content: url,
                 success: function (layero, index) {
                     // 弹窗加载成功后的回调
@@ -326,7 +280,7 @@
             var id = $(this).attr('data-id');
             var status = obj.elem.checked ? 1 : 0;
             $.ajax({
-                url: '/api/news/updateStatus',
+                url: '/api/product-category/updateStatus',
                 method: 'POST',
                 dataType: 'json',
                 data: {id: id, status: status},
@@ -355,7 +309,7 @@
 
 
             $.ajax({
-                url: '/api/news/updateSort',
+                url: '/api/product-category/updateSort',
                 method: 'POST',
                 dataType: 'json',
                 data: {id: id, sort: sort},
@@ -377,7 +331,7 @@
         function deleteData(id) {
             layer.confirm('确认删除吗', function (index) {
                 $.ajax({
-                    url: '/api/news/delete/' + id,
+                    url: '/api/product-category/delete/' + id,
                     method: 'POST',
                     dataType: 'json',
                     success: function (res) {
@@ -409,7 +363,7 @@
             layer.confirm('确定要删除选中的' + selectedIds.length + '条记录吗', function (index) {
                 // 发送批量删除请求
                 $.ajax({
-                    url: '/api/news/batchDelete',
+                    url: '/api/product-category/batchDelete',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify({ids: selectedIds}),

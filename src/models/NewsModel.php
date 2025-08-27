@@ -10,33 +10,110 @@ class NewsModel
     }
 
     /**
-     * @param $title
-     * @param $category_id
-     * @param $description
-     * @param $keyword
-     * @param $content
-     * @param $key1
-     * @param $url1
-     * @param $key2
-     * @param $url2
-     * @param $key3
-     * @param $url3
-     * @param $key4
-     * @param $url4
-     * @param $key5
-     * @param $url5
-     * @return mixed
      * 添加新闻
      */
-    public function create($title, $category_id, $description, $keyword, $content, $key1, $url1, $key2, $url2, $key3, $url3, $key4, $url4, $key5, $url5)
+    public function create(
+        $category_id,
+        $title,
+        $title_en,
+        $description,
+        $description_en,
+        $keyword,
+        $keyword_en,
+        $content,
+        $content_en,
+        $key1,
+        $key1_en,
+        $key2,
+        $key2_en,
+        $key3,
+        $key3_en,
+        $key4,
+        $key4_en,
+        $key5,
+        $key5_en,
+        $url1,
+        $url1_en,
+        $url2,
+        $url2_en,
+        $url3,
+        $url3_en,
+        $url4,
+        $url4_en,
+        $url5,
+        $url5_en
+    )
     {
 
-        $sql = "INSERT INTO news (title, category_id, description, keyword, content, key1, url1, key2, url2, key3, url3, key4, url4, key5, url5, created_at)
-        VALUES (:title, :category_id, :description, :keyword, :content, :key1, :url1, :key2, :url2, :key3, :url3, :key4, :url4, :key5, :url5, NOW())";
+        $sql = "INSERT INTO news (
+                  category_id, 
+                  title, 
+                  title_en, 
+                  description, 
+                  description_en, 
+                  keyword, 
+                  keyword_en, 
+                  content, 
+                  content_en, 
+                  key1, 
+                  key1_en, 
+                  key2, 
+                  key2_en, 
+                  key3, 
+                  key3_en, 
+                  key4, 
+                  key4_en, 
+                  key5, 
+                  key5_en, 
+                  url1, 
+                  url1_en, 
+                  url2, 
+                  url2_en, 
+                  url3,
+                  url3_en, 
+                  url4, 
+                  url4_en, 
+                  url5, 
+                  url5_en, 
+                  created_at
+                  )
+        VALUES (
+                :category_id, 
+                :title, 
+                :title_en, 
+                :description, 
+                :description_en,
+                :keyword, 
+                :keyword_en, 
+                :content, 
+                :content_en, 
+                :key1, 
+                :key1_en, 
+                :key2, 
+                :key2_en, 
+                :key3, 
+                :key3_en, 
+                :key4, 
+                :key4_en, 
+                :key5, 
+                :key5_en, 
+                :url1, 
+                :url1_en, 
+                :url2, 
+                :url2_en, 
+                :url3, 
+                :url3_en, 
+                :url4, 
+                :url4_en, 
+                :url5, 
+                :url5_en, 
+                NOW()
+                )";
         $stmt = $this->pdo->prepare($sql);
 
-        $stmt->bindParam(':title', $title);
+
         $stmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
+        $stmt->bindParam(':title', $title);
         $stmt->bindParam(':description', $description);
         $stmt->bindParam(':keyword', $keyword);
         $stmt->bindParam(':content', $content);
@@ -50,6 +127,20 @@ class NewsModel
         $stmt->bindParam(':url4', $url4);
         $stmt->bindParam(':key5', $key5);
         $stmt->bindParam(':url5', $url5);
+        $stmt->bindParam(':title_en', $title_en);
+        $stmt->bindParam(':description_en', $description_en);
+        $stmt->bindParam(':keyword_en', $keyword_en);
+        $stmt->bindParam(':content_en', $content_en);
+        $stmt->bindParam(':key1_en', $key1_en);
+        $stmt->bindParam(':url1_en', $url1_en);
+        $stmt->bindParam(':key2_en', $key2_en);
+        $stmt->bindParam(':url2_en', $url2_en);
+        $stmt->bindParam(':key3_en', $key3_en);
+        $stmt->bindParam(':url3_en', $url3_en);
+        $stmt->bindParam(':key4_en', $key4_en);
+        $stmt->bindParam(':url4_en', $url4_en);
+        $stmt->bindParam(':key5_en', $key5_en);
+        $stmt->bindParam(':url5_en', $url5_en);
 
         return $stmt->execute();
     }
@@ -112,15 +203,42 @@ class NewsModel
     }
 
     public function update($id, $data) {
-        $sql = "UPDATE news SET title = :title, category_id = :category_id, description = :description, keyword = :keyword, 
-                content = :content, key1 = :key1, url1 = :url1, key2 = :key2, url2 = :url2, key3 = :key3, url3 = :url3, 
-                key4 = :key4, url4 = :url4, key5 = :key5, url5 = :url5 
+        $sql = "UPDATE news SET 
+                category_id = :category_id, 
+                title = :title, 
+                description = :description, 
+                keyword = :keyword, 
+                content = :content, 
+                key1 = :key1, 
+                url1 = :url1, 
+                key2 = :key2, 
+                url2 = :url2, 
+                key3 = :key3, 
+                url3 = :url3, 
+                key4 = :key4, 
+                url4 = :url4, 
+                key5 = :key5, 
+                url5 = :url5 
+                title_en = :title_en, 
+                description_en = :description_en, 
+                keyword_en = :keyword_en, 
+                content_en = :content_en, 
+                key1_en = :key1_en, 
+                url1_en = :url1_en, 
+                key2_en = :key2_en, 
+                url2_en = :url2_en, 
+                key3_en = :key3_en, 
+                url3_en = :url3_en, 
+                key4_en = :key4_en, 
+                url4_en = :url4_en, 
+                key5_en = :key5_en, 
+                url5_en = :url5_en 
                 WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             ':id' => $id,
-            ':title' => $data['title'],
             ':category_id' => (int)$data['category_id'],
+            ':title' => $data['title'],
             ':description' => $data['description'],
             ':keyword' => $data['keyword'],
             ':content' => $data['content'],
@@ -134,6 +252,20 @@ class NewsModel
             ':url4' => $data['url4'],
             ':key5' => $data['key5'],
             ':url5' => $data['url5'],
+            ':title_en' => $data['title_en'],
+            ':description_en' => $data['description_en'],
+            ':keyword_en' => $data['keyword_en'],
+            ':content_en' => $data['content_en'],
+            ':key1_en' => $data['key1_en'],
+            ':url1_en' => $data['url1_en'],
+            ':key2_en' => $data['key2_en'],
+            ':url2_en' => $data['url2_en'],
+            ':key3_en' => $data['key3_en'],
+            ':url3_en' => $data['url3_en'],
+            ':key4_en' => $data['key4_en'],
+            ':url4_en' => $data['url4_en'],
+            ':key5_en' => $data['key5_en'],
+            ':url5_en' => $data['url5_en']
         ]);
         return $stmt->rowCount();
     }

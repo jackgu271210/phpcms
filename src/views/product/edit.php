@@ -3,6 +3,7 @@
 <!--头部-->
 
 <?php
+$categories = $this->newsModel->getCategories();
 $data = $news ?? [];
 ?>
 
@@ -15,14 +16,6 @@ $data = $news ?? [];
                 <div class="layui-input-block">
                     <input type="text" name="title"
                            value="<?php echo htmlspecialchars($data['title'] ?? ''); ?>"
-                           class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">标题（英）</label>
-                <div class="layui-input-block">
-                    <input type="text" name="title_en"
-                           value="<?php echo htmlspecialchars($data['title_en'] ?? ''); ?>"
                            class="layui-input">
                 </div>
             </div>
@@ -48,26 +41,10 @@ $data = $news ?? [];
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">网页描述（英）</label>
-                <div class="layui-input-block">
-                    <textarea name="description_en" class="layui-textarea"><?php
-                        echo htmlspecialchars($data['description_en'] ?? '');
-                        ?>
-                    </textarea>
-                </div>
-            </div>
-            <div class="layui-form-item">
                 <label class="layui-form-label">关键词</label>
                 <div class="layui-input-block">
                     <input type="text" name="keyword"
                            value="<?php echo htmlspecialchars($data['keyword'] ?? ''); ?>" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">关键词（英）</label>
-                <div class="layui-input-block">
-                    <input type="text" name="keyword_en"
-                           value="<?php echo htmlspecialchars($data['keyword_en'] ?? ''); ?>" class="layui-input">
                 </div>
             </div>
             <div class="layui-form-item">
@@ -79,19 +56,6 @@ $data = $news ?? [];
                     </div>
                     <textarea name="content" id="editor-content" style="display:none;"><?php
                         echo htmlspecialchars($data['content'] ?? '');
-                        ?>
-                    </textarea>
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">新闻内容（英）</label>
-                <div class="layui-input-block">
-                    <div id="editor—wrapper">
-                        <div id="toolbar-container"><!-- 工具栏 --></div>
-                        <div id="editor-container"><!-- 编辑器 --></div>
-                    </div>
-                    <textarea name="content_en" id="editor-content" style="display:none;"><?php
-                        echo htmlspecialchars($data['content_en'] ?? '');
                         ?>
                     </textarea>
                 </div>
@@ -112,28 +76,6 @@ $data = $news ?? [];
                             <div class="layui-input-block">
                                 <input type="text" name="url<?php echo $i; ?>"
                                        value="<?php echo htmlspecialchars($data["url$i"] ?? ''); ?>"
-                                       class="layui-input">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <?php endfor; ?>
-            <?php for ($i = 1; $i <= 5; $i++): ?>
-                <div class="layui-form-item">
-                    <div class="layui-row layui-col-space16">
-                        <div class="layui-col-xs6">
-                            <label class="layui-form-label">内联关键词<?php echo $i; ?>（英）</label>
-                            <div class="layui-input-block">
-                                <input type="text" name="key<?php echo $i; ?>_en"
-                                       value="<?php echo htmlspecialchars($data["key{$i}_en"] ?? ''); ?>"
-                                       class="layui-input">
-                            </div>
-                        </div>
-                        <div class="layui-col-xs6">
-                            <label class="layui-form-label">链接<?php echo $i; ?>（英）</label>
-                            <div class="layui-input-block">
-                                <input type="text" name="url<?php echo $i; ?>_en"
-                                       value="<?php echo htmlspecialchars($data["url{$i}_en"] ?? ''); ?>"
                                        class="layui-input">
                             </div>
                         </div>
@@ -204,6 +146,26 @@ $data = $news ?? [];
             });
         }
 
+        // 设置表单数据函数
+        window.setFormData = function (data) {
+            // 基础字段
+            $('input[name="title"]').val(data.title || '');
+            $('select[name="category_id"]').val(data.category_id || '');
+            $('textarea[name="description"]').val(data.description || '');
+            $('input[name="keyword"]').val(data.keyword || '');
+
+            // 编辑器内容
+            $('#editor-content').val(data.content || '');
+            initEditor(data.content || '');
+
+            // 动态字段 key1-url5
+            for (var i = 1; i <= 5; i++) {
+                $('input[name="key' + i + '"]').val(data['key' + i] || '');
+                $('input[name="url' + i + '"]').val(data['url' + i] || '');
+            }
+
+            form.render();
+        };
 
         // 初始化
         form.render();
