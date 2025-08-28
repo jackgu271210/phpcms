@@ -73,11 +73,11 @@ $data = $news ?? [];
             <div class="layui-form-item">
                 <label class="layui-form-label">新闻内容</label>
                 <div class="layui-input-block">
-                    <div id="editor—wrapper">
-                        <div id="toolbar-container"><!-- 工具栏 --></div>
-                        <div id="editor-container"><!-- 编辑器 --></div>
+                    <div id="editor-wrapper-cn">
+                        <div id="toolbar-container-cn"><!-- 工具栏 --></div>
+                        <div id="editor-container-cn"><!-- 编辑器 --></div>
                     </div>
-                    <textarea name="content" id="editor-content" style="display:none;"><?php
+                    <textarea name="content" id="editor-content-cn" style="display:none;"><?php
                         echo htmlspecialchars($data['content'] ?? '');
                         ?>
                     </textarea>
@@ -86,11 +86,11 @@ $data = $news ?? [];
             <div class="layui-form-item">
                 <label class="layui-form-label">新闻内容（英）</label>
                 <div class="layui-input-block">
-                    <div id="editor—wrapper">
-                        <div id="toolbar-container"><!-- 工具栏 --></div>
-                        <div id="editor-container"><!-- 编辑器 --></div>
+                    <div id="editor-wrapper-en">
+                        <div id="toolbar-container-en"><!-- 工具栏 --></div>
+                        <div id="editor-container-en"><!-- 编辑器 --></div>
                     </div>
-                    <textarea name="content_en" id="editor-content" style="display:none;"><?php
+                    <textarea name="content_en" id="editor-content-en" style="display:none;"><?php
                         echo htmlspecialchars($data['content_en'] ?? '');
                         ?>
                     </textarea>
@@ -159,55 +159,25 @@ $data = $news ?? [];
         var $ = layui.$;
         var layer = layui.layer;
 
-        // 初始化编辑器函数
-        function initEditor(initialContent) {
-            const {createEditor, createToolbar} = window.wangEditor;
-
-            const editorConfig = {
-                placeholder: '请输入新闻内容...',
-                onChange(editor) {
-                    $('#editor-content').val(editor.getHtml());
+        // 配置多个编辑器
+        $(document).ready(function() {
+            initEditors([
+                {
+                    wrapperId: 'editor-wrapper-cn',
+                    toolbarId: 'toolbar-container-cn',
+                    editorId: 'editor-container-cn',
+                    contentId: 'editor-content-cn',
+                    customConfig: {}
                 },
-                MENU_CONF: {
-                    uploadImage: {
-                        server: '/upload',
-                        fieldName: 'file',
-                        maxFileSize: 20 * 1024 * 1024,
-                        allowedFileTypes: ['image/*'],
-                        customInsert(res, insertFn) {
-                            if (res.errno !== 0) {
-                                parent.layer.msg(res.message, {icon: 2});
-                                return;
-                            }
-                            insertFn(res.data.url);
-                        }
-                    }
+                {
+                    wrapperId: 'editor-wrapper-en',
+                    toolbarId: 'toolbar-container-en',
+                    editorId: 'editor-container-en',
+                    contentId: 'editor-content-en',
+                    customConfig: {}
                 }
-            };
-
-            if (window.editor) {
-                window.editor.destroy();
-            }
-
-            window.editor = createEditor({
-                selector: '#editor-container',
-                html: initialContent || '',
-                config: editorConfig,
-                mode: 'default',
-            });
-
-            createToolbar({
-                editor: window.editor,
-                selector: '#toolbar-container',
-                config: {},
-                mode: 'default',
-            });
-        }
-
-
-        // 初始化
-        form.render();
-        initEditor($('#editor-content').val() || '');
+            ], $)
+        });
 
         // 表单提交
         form.on('submit(formSubmit)', function (data) {

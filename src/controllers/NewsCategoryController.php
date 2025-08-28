@@ -54,7 +54,10 @@ class NewsCategoryController {
         $data = [
             'title' => isset($_POST['title']) ? trim($_POST['title']) : '',
             'description' => isset($_POST['description']) ? trim($_POST['description']) : '',
-            'keyword' => isset($_POST['keyword']) ? trim($_POST['keyword']) : ''
+            'keyword' => isset($_POST['keyword']) ? trim($_POST['keyword']) : '',
+            'title_en' => isset($_POST['title_en']) ? trim($_POST['title_en']) : '',
+            'description_en' => isset($_POST['description_en']) ? trim($_POST['description_en']) : '',
+            'keyword_en' => isset($_POST['keyword_en']) ? trim($_POST['keyword_en']) : ''
         ];
 
         // 验证数据
@@ -78,7 +81,10 @@ class NewsCategoryController {
                 $this->newsCategoryModel->create(
                     $data['title'],
                     $data['description'],
-                    $data['keyword']
+                    $data['keyword'],
+                    $data['title_en'],
+                    $data['description_en'],
+                    $data['keyword_en']
                 );
                 echo json_encode([
                     'code' => 0,

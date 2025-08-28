@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 //上传目录
 $uploadDir = 'uploads/';
 $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-$maxFileSize = 5 * 1024 * 1024; //5MB
+$maxFileSize = 2 * 1024 * 1024; //2MB
 
 //确保上传目录存在
 if (!is_dir($uploadDir)) {

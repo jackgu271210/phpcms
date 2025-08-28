@@ -10,34 +10,44 @@ class NewsCategoryModel
     }
 
     /**
-     * @param $title
-     * @param $category_id
-     * @param $description
-     * @param $keyword
-     * @param $content
-     * @param $key1
-     * @param $url1
-     * @param $key2
-     * @param $url2
-     * @param $key3
-     * @param $url3
-     * @param $key4
-     * @param $url4
-     * @param $key5
-     * @param $url5
-     * @return mixed
      * 添加新闻
      */
-    public function create($title, $description, $keyword)
+    public function create(
+        $title,
+        $description,
+        $keyword,
+        $title_en,
+        $description_en,
+        $keyword_en
+    )
     {
 
-        $sql = "INSERT INTO news_categories (title, description, keyword, created_at)
-        VALUES (:title, :description, :keyword, NOW())";
+        $sql = "INSERT INTO news_categories (
+                             title, 
+                             description, 
+                             keyword, 
+                             title_en, 
+                             description_en, 
+                             keyword_en, 
+                             created_at
+                             )
+        VALUES (
+                :title, 
+                :description, 
+                :keyword, 
+                :title_en, 
+                :description_en, 
+                :keyword_en
+                NOW()
+                )";
         $stmt = $this->pdo->prepare($sql);
 
         $stmt->bindParam(':title', $title);
         $stmt->bindParam(':description', $description);
         $stmt->bindParam(':keyword', $keyword);
+        $stmt->bindParam(':title_en', $title_en);
+        $stmt->bindParam(':description_en', $description_en);
+        $stmt->bindParam(':keyword_en', $keyword_en);
 
         return $stmt->execute();
     }
@@ -93,14 +103,20 @@ class NewsCategoryModel
         $sql = "UPDATE news_categories SET 
                            title = :title, 
                            description = :description, 
-                           keyword = :keyword
+                           keyword = :keyword, 
+                           title_en = :title_en, 
+                           description_en = :description_en, 
+                           keyword_en = :keyword_en
                            WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             ':id' => $id,
             ':title' => $data['title'],
             ':description' => $data['description'],
-            ':keyword' => $data['keyword']
+            ':keyword' => $data['keyword'],
+            ':title_en' => $data['title_en'],
+            ':description_en' => $data['description_en'],
+            ':keyword_en' => $data['keyword_en']
         ]);
         return $stmt->rowCount();
     }

@@ -218,7 +218,7 @@ class NewsModel
                 key4 = :key4, 
                 url4 = :url4, 
                 key5 = :key5, 
-                url5 = :url5 
+                url5 = :url5, 
                 title_en = :title_en, 
                 description_en = :description_en, 
                 keyword_en = :keyword_en, 

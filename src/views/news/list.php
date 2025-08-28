@@ -86,7 +86,7 @@
 <?php require_once APP_PATH . '/views/layouts/script.php' ?>
 <!--SCRIPT-->
 <script>
-    layui.use(['table', 'form', 'laydate', 'tabs', 'layer'], function () {
+    layui.use(['table', 'form', 'laydate', 'tabs', 'layer'], function() {
         var table = layui.table;
         var form = layui.form;
         var layer = layui.layer;
@@ -94,103 +94,6 @@
         var tabs = layui.tabs;
         var $ = layui.$;
 
-        // 初始化选项卡
-        var mainTab = tabs.render({
-            elem: '.layui-tabs',
-            filter: 'main-tabs',
-            allowClose: true,
-            onSwitch: function (data) {
-                console.log('切换到选项卡:', data);
-            },
-            onClose: function (data) {
-                console.log("关闭选项卡", data);
-            }
-        });
-
-        // 侧边栏点击事件
-        $('body').on('click', '.layui-nav-tree a[data-url]', function (e) {
-            e.preventDefault();
-
-            var url = $(this).data('url');
-            var title = $(this).data('title') || '新页面';
-            var icon = $(this).find('.layui-icon').attr('class') || 'layui-icon-file';
-
-            // 打开选项卡
-            openTab(title, url, icon);
-        });
-
-        // 打开选项卡函数
-        function openTab(title, url, icon) {
-            var tabId = 'tab_' + Math.random().toString(36).substr(2);
-
-            // 检查是否已存在相同标题的选项卡
-            var exists = false;
-            $('.layui-tab-title li').each(function () {
-                var tabTitle = $(this).text().trim();
-                if (tabTitle === title) {
-                    exists = true;
-                    var existTabId = $(this).attr('lay-id');
-                    // 切换到已存在的选项卡
-                    tabs.change('main-tabs', existTabId);
-                    return false;
-                }
-            });
-
-            if (!exists) {
-                // 添加新选项卡
-                tabs.add('main-tabs', {
-                    title: 'New Tab 1',
-                    content: 'New Tab Content 1',
-                    done: function (data) {
-                        console.log(data); // 标签相关数据
-                        // 为新标签头添加任意属性
-                        data.headerItem.attr('lay-tips', '111');
-                    }
-                    // id: tabId,
-                    // title: '<i class=" ' +icon+ ' "></i>' + title,
-                    //  content: '<iframe src=" ' +url+ ' " frameborder="0" class="layui-frame"></iframe>'
-                });
-
-                // 切换到新选项卡
-                tabs.change('main-tabs', tabId);
-            }
-        }
-
-        // 全局关闭当前选项卡
-        window.closeCurrentTab = function () {
-            var currentTab = $('.layui-tab-title .alyui-tab-active');
-            var tabId = currentTab.attr('lay-id');
-
-            // 不能关闭首页
-            if (tabId !== 'home') {
-                tabs.tabDelete('main-tabs', tabId);
-            }
-        };
-
-        // 关闭指定选项卡
-        window.closeTab = function (tabId) {
-            tabs.tabDelete('main-tabs', tabId);
-        };
-
-        // 刷新当前选项卡
-        window.reloadCurrentTab = function () {
-            var currentTab = $('.layui-tab-title .layui-tab-active');
-            var iframe = currentTab.closest('.layui-tab-item').find('iframe');
-            if (iframe.length) {
-                iframe[0].contentWindow.loaction.reload();
-            }
-        };
-
-        // 监听自定义关闭事件
-        $('body').on('click', '.layui-tab-close', function (e) {
-            e.stopPropagation();
-            var li = $(this).closest('li');
-            var tabId = li.attr('lay-id');
-
-            if (tabId !== 'home') {
-                tabs.tabDelete('main-tabs', tabId);
-            }
-        });
 
         // 初始化表格
         window.tableIns = table.render({
@@ -207,7 +110,7 @@
                 {field: 'status', title: '状态', width: 100, templet: '#statusTemplate'},
                 {field: 'sort', title: '排序', width: 160, templet: '#sortTemplate'},
                 {field: 'created_at', title: '加入时间', width: 200, sort: true},
-                {fixed: 'right', title: '操作', width: 110, templet: '#toolDemo'}
+                {fixed: 'right', title:'操作', width: 110, templet: '#toolDemo'}
             ]]
         });
 
@@ -222,18 +125,18 @@
                 url: '/api/news/categories',
                 type: 'GET',
                 dataType: 'json',
-                success: function (res) {
+                success: function(res) {
                     if (res.code === 0) {
                         var html = '<option value="">所有新闻</option>';
-                        $.each(res.data, function (index, item) {
-                            html += '<option value="' + item.id + '">' + item.title + '</option>'
+                        $.each(res.data, function(index, item) {
+                            html += '<option value="'+item.id+'">' +item.title+ '</option>'
                         });
                         $('select[name="category_id"]').html(html);
                         form.render('select');
                     }
                 },
-                error: function () {
-                    layer.msg('网络错误', {icon: 2});
+                error: function() {
+                    layer.msg('网络错误', {icon:2});
                 }
             });
         }
@@ -242,7 +145,7 @@
         loadCategories();
 
         // 分类筛选事件
-        form.on('select(category-filter)', function (data) {
+        form.on('select(category-filter)', function(data) {
             var where = {};
             if (data.value) {
                 where.category_id = data.value;
@@ -254,7 +157,7 @@
         });
 
         // 搜索按钮提交事件
-        form.on('submit(search)', function (data) {
+        form.on('submit(search)', function(data) {
             var where = {};
 
             // 日期范围
@@ -280,7 +183,7 @@
         })
 
         // 添加按钮
-        $('#btnAdd').click(function () {
+        $('#btnAdd').click(function() {
             showForm();
         });
 
@@ -301,28 +204,22 @@
             var url = id ? '/api/news/edit/' + id : '/api/news/create';
             var title = id ? '编辑新闻' : '添加新闻';
             layer.open({
-                type: 2,
-                title: title,
+                type:2,
+                title:title,
                 area: ['80%', '80%'],
                 content: url,
-                success: function (layero, index) {
+                success: function(layero, index) {
                     // 弹窗加载成功后的回调
                     var iframe = layero.find('iframe')[0];
                     var iframeWin = iframe.contentWindow;
 
                     // 如果是编辑，可以传递数据到iframe
-                    if (id && data) {
-                        // 延迟确保iframe加载完成
-                        setTimeout(function () {
-                            iframeWin.setFormData(data);
-                        }, 300);
-                    }
                 }
             });
         }
 
         // 状态开关事件
-        form.on('switch(statusSwitch)', function (obj) {
+        form.on('switch(statusSwitch)', function(obj) {
             var id = $(this).attr('data-id');
             var status = obj.elem.checked ? 1 : 0;
             $.ajax({
@@ -330,18 +227,18 @@
                 method: 'POST',
                 dataType: 'json',
                 data: {id: id, status: status},
-                success: function (res) {
+                success: function(res) {
                     if (res.code === 0) {
-                        layer.msg(res.msg, {icon: 1});
+                        layer.msg(res.msg, {icon:1});
                         tableIns.reload();
                     } else {
-                        layer.msg(res.msg, {icon: 2});
+                        layer.msg(res.msg, {icon:2});
                         obj.elem.checked = !obj.elem.checked;
                         form.render('checkbox');
                     }
                 },
-                error: function () {
-                    layer.msg('请求失败', {icon: 2});
+                error: function() {
+                    layer.msg('请求失败', {icon:2});
                     obj.elem.checked = !obj.elem.checked;
                     form.render('checkbox');
                 }
@@ -349,7 +246,7 @@
         })
 
         // 排序输入框事件
-        $(document).on('change', '.sort-input', function () {
+        $(document).on('change', '.sort-input', function() {
             var id = $(this).data('id');
             var sort = $(this).val();
 
@@ -359,37 +256,37 @@
                 method: 'POST',
                 dataType: 'json',
                 data: {id: id, sort: sort},
-                success: function (res) {
+                success: function(res) {
                     if (res.code === 0) {
-                        layer.msg(res.msg, {icon: 1});
+                        layer.msg(res.msg, {icon:1});
                         tableIns.reload();
                     } else {
-                        layer.msg(res.msg, {icon: 2});
+                        layer.msg(res.msg, {icon:2});
                     }
                 },
-                error: function () {
-                    layer.msg('请求失败', {icon: 2});
+                error: function() {
+                    layer.msg('请求失败', {icon:2});
                 }
             })
         })
 
         // 单个删除数据
         function deleteData(id) {
-            layer.confirm('确认删除吗', function (index) {
+            layer.confirm('确认删除吗', function(index) {
                 $.ajax({
                     url: '/api/news/delete/' + id,
                     method: 'POST',
                     dataType: 'json',
-                    success: function (res) {
+                    success: function(res) {
                         if (res.code === 0) {
-                            layer.msg(res.msg, {icon: 1});
+                            layer.msg(res.msg, {icon:1});
                             tableIns.reload();
                         } else {
-                            layer.msg(res.msg, {icon: 2});
+                            layer.msg(res.msg, {icon:2});
                         }
                     },
-                    error: function () {
-                        layer.msg('请求失败', {icon: 2});
+                    error: function() {
+                        layer.msg('请求失败', {icon:2});
                         layer.close(index);
                     }
                 })
@@ -398,32 +295,32 @@
 
 
         // 批量删除点击按钮事件
-        $('#btnBatchDelete').click(function () {
+        $('#btnBatchDelete').click(function() {
             var checkStatus = table.checkStatus('newsTable');
             var selectedIds = checkStatus.data ? checkStatus.data.map(item => item.id) : [];
 
             if (selectedIds.length === 0) {
-                layer.msg('请至少选择一条记录', {icon: 2});
+                layer.msg('请至少选择一条记录', {icon:2});
                 return;
             }
-            layer.confirm('确定要删除选中的' + selectedIds.length + '条记录吗', function (index) {
+            layer.confirm('确定要删除选中的' +selectedIds.length + '条记录吗', function(index) {
                 // 发送批量删除请求
                 $.ajax({
                     url: '/api/news/batchDelete',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify({ids: selectedIds}),
-                    success: function (res) {
+                    success: function(res) {
                         if (res.code === 0) {
                             console.log('删除成功');
-                            layer.msg(res.msg, {icon: 1});
+                            layer.msg(res.msg, {icon:1});
                             tableIns.reload();
                         } else {
-                            layer.msg(res.msg, {icon: 2});
+                            layer.msg(res.msg, {icon:2});
                         }
                     },
-                    error: function () {
-                        layer.msg('请求失败', {icon: 2})
+                    error: function() {
+                        layer.msg('请求失败', {icon:2})
                     }
                 });
                 layer.close(index);
@@ -431,7 +328,6 @@
         })
     });
 </script>
-
 
 
 

@@ -86,103 +86,6 @@
         var tabs = layui.tabs;
         var $ = layui.$;
 
-        // 初始化选项卡
-        var mainTab = tabs.render({
-            elem: '.layui-tabs',
-            filter: 'main-tabs',
-            allowClose: true,
-            onSwitch: function (data) {
-                console.log('切换到选项卡:', data);
-            },
-            onClose: function (data) {
-                console.log("关闭选项卡", data);
-            }
-        });
-
-        // 侧边栏点击事件
-        $('body').on('click', '.layui-nav-tree a[data-url]', function (e) {
-            e.preventDefault();
-
-            var url = $(this).data('url');
-            var title = $(this).data('title') || '新页面';
-            var icon = $(this).find('.layui-icon').attr('class') || 'layui-icon-file';
-
-            // 打开选项卡
-            openTab(title, url, icon);
-        });
-
-        // 打开选项卡函数
-        function openTab(title, url, icon) {
-            var tabId = 'tab_' + Math.random().toString(36).substr(2);
-
-            // 检查是否已存在相同标题的选项卡
-            var exists = false;
-            $('.layui-tab-title li').each(function () {
-                var tabTitle = $(this).text().trim();
-                if (tabTitle === title) {
-                    exists = true;
-                    var existTabId = $(this).attr('lay-id');
-                    // 切换到已存在的选项卡
-                    tabs.change('main-tabs', existTabId);
-                    return false;
-                }
-            });
-
-            if (!exists) {
-                // 添加新选项卡
-                tabs.add('main-tabs', {
-                    title: 'New Tab 1',
-                    content: 'New Tab Content 1',
-                    done: function (data) {
-                        console.log(data); // 标签相关数据
-                        // 为新标签头添加任意属性
-                        data.headerItem.attr('lay-tips', '111');
-                    }
-                    // id: tabId,
-                    // title: '<i class=" ' +icon+ ' "></i>' + title,
-                    //  content: '<iframe src=" ' +url+ ' " frameborder="0" class="layui-frame"></iframe>'
-                });
-
-                // 切换到新选项卡
-                tabs.change('main-tabs', tabId);
-            }
-        }
-
-        // 全局关闭当前选项卡
-        window.closeCurrentTab = function () {
-            var currentTab = $('.layui-tab-title .alyui-tab-active');
-            var tabId = currentTab.attr('lay-id');
-
-            // 不能关闭首页
-            if (tabId !== 'home') {
-                tabs.tabDelete('main-tabs', tabId);
-            }
-        };
-
-        // 关闭指定选项卡
-        window.closeTab = function (tabId) {
-            tabs.tabDelete('main-tabs', tabId);
-        };
-
-        // 刷新当前选项卡
-        window.reloadCurrentTab = function () {
-            var currentTab = $('.layui-tab-title .layui-tab-active');
-            var iframe = currentTab.closest('.layui-tab-item').find('iframe');
-            if (iframe.length) {
-                iframe[0].contentWindow.loaction.reload();
-            }
-        };
-
-        // 监听自定义关闭事件
-        $('body').on('click', '.layui-tab-close', function (e) {
-            e.stopPropagation();
-            var li = $(this).closest('li');
-            var tabId = li.attr('lay-id');
-
-            if (tabId !== 'home') {
-                tabs.tabDelete('main-tabs', tabId);
-            }
-        });
 
         // 初始化表格
         window.tableIns = table.render({
@@ -253,7 +156,7 @@
             data = data || {};
             var id = data.id;
             var url = id ? '/api/news-category/edit/' + id : '/api/news-category/create';
-            var title = id ? '编辑新闻' : '添加新闻';
+            var title = id ? '编辑新闻大类' : '添加新闻大类';
             layer.open({
                 type: 2,
                 title: title,

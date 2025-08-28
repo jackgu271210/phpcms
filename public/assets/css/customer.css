@@ -1,12 +1,18 @@
 
-#editor—wrapper {
+#editor-wrapper-cn,
+#editor-wrapper-en
+{
     border: 1px solid #ccc;
     z-index: 100; /* 按需定义 */
 }
-#toolbar-container {
+#toolbar-container-cn,
+#toolbar-container-en
+{
     border-bottom: 1px solid #ccc;
 }
-#editor-container {
+#editor-container-cn,
+#editor-container-en
+{
     height: 500px;
 }
 .category-select {

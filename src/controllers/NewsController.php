@@ -92,6 +92,13 @@ class NewsController {
             ]);
             exit;
         }
+        if (empty($data['content'])) {
+            echo json_encode([
+                'code' => 1,
+                'msg' => '内容不能为空'
+            ]);
+            exit;
+        }
 
         //调用模型保存数据
         try {
