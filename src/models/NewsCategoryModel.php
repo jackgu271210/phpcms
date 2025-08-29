@@ -37,7 +37,7 @@ class NewsCategoryModel
                 :keyword, 
                 :title_en, 
                 :description_en, 
-                :keyword_en
+                :keyword_en,
                 NOW()
                 )";
         $stmt = $this->pdo->prepare($sql);
